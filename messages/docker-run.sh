@@ -2,11 +2,11 @@
 
 set -e
 
-IMAGE_NAME=wt-messages
+IMAGE_NAME=esc4jmcna-messages
 
 # Check that the correct number of arguments were provided.
 if [ $# -ne 7 ]; then
-    echo "Usage: sh docker-run.sh <user> <json-input-path> <flow-name> <variable-name> <json-output-path> <csv-output-path> <coda-output-path>"
+    echo "Usage: sh docker-run.sh <user> <json-input-path> <flow-name> <variable-name> <json-output-path> <interface-output-dir> <coda-output-path>"
     exit
 fi
 
@@ -16,7 +16,7 @@ INPUT_JSON=$2
 FLOW_NAME=$3
 VARIABLE_NAME=$4
 OUTPUT_JSON=$5
-OUTPUT_CSV=$6
+OUTPUT_INTERFACE_DIR=$6
 OUTPUT_CODA=$7
 
 # Build an image for this pipeline stage.
@@ -41,8 +41,8 @@ docker start -a -i "$container"
 mkdir -p "$(dirname "$OUTPUT_JSON")"
 docker cp "$container:/data/output.json" "$OUTPUT_JSON"
 
-mkdir -p "$(dirname "$OUTPUT_CSV")"
-docker cp "$container:/data/output.csv" "$OUTPUT_CSV"
+mkdir -p "$OUTPUT_INTERFACE_DIR"
+docker cp "$container:/data/output-interface/." "$OUTPUT_INTERFACE_DIR"
 
 mkdir -p "$(dirname "$OUTPUT_CODA")"
 docker cp "$container:/data/output-coda.csv" "$OUTPUT_CODA"

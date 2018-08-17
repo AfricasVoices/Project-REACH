@@ -1,8 +1,12 @@
 import argparse
-import os
+import time
 
-from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCSVIO, TracedDataCodaIO
+import pytz
+from core_data_modules.traced_data import Metadata
+from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCodaIO, \
+    TracedDataTheInterfaceIO
 from core_data_modules.util import IOUtils
+from dateutil.parser import isoparse
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Cleans a list of messages, and outputs to formats "
@@ -16,8 +20,8 @@ if __name__ == "__main__":
                         help="Name of message variable in flow")
     parser.add_argument("json_output_path", metavar="json-output-path",
                         help="Path to a JSON file to write processed messages to")
-    parser.add_argument("csv_output_path", metavar="csv-output-path",
-                        help="Path to a CSV file to write processed messages to")
+    parser.add_argument("interface_output_dir", metavar="interface-output-dir",
+                        help="Path to a directory to write The Interface files to")
     parser.add_argument("coda_output_path", metavar="coda-output-path",
                         help="Path to a Coda file to write processed messages to")
 
@@ -27,37 +31,45 @@ if __name__ == "__main__":
     variable_name = args.variable_name
     flow_name = args.flow_name
     json_output_path = args.json_output_path
-    csv_output_path = args.csv_output_path
+    interface_output_dir = args.interface_output_dir
     coda_output_path = args.coda_output_path
 
     # Load data from JSON file
     with open(json_input_path, "r") as f:
-        data = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
+        show_messages = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
+
+    # TODO (Somewhere): Filter out test messages sent by AVF.
 
     # Filter for runs which contain a response to this week's question.
-    data = list(filter(lambda td: "{} (Text) - {}".format(variable_name, flow_name) in td, data))
+    show_messages = [td for td in show_messages if "{} (Text) - {}".format(variable_name, flow_name) in td]
+
+    # Convert date/time of messages to EAT
+    for td in show_messages:
+        utc_key = "{} (Time) - {}".format(variable_name, flow_name)
+        eat_key = "{} (Time EAT) - {}".format(variable_name, flow_name)
+
+        utc_time = isoparse(td[utc_key])
+        eat_time = utc_time.astimezone(pytz.timezone("Africa/Nairobi")).isoformat()
+
+        td.append_data(
+            {"{} (Time EAT) - {}".format(variable_name, flow_name): eat_time},
+            Metadata(user, Metadata.get_call_location(), time.time())
+        )
 
     # Write json output
-    if os.path.dirname(json_output_path) is not "" and not os.path.exists(os.path.dirname(json_output_path)):
-        os.makedirs(os.path.dirname(json_output_path))
+    IOUtils.ensure_dirs_exist_for_file(json_output_path)
     with open(json_output_path, "w") as f:
-        TracedDataJsonIO.export_traced_data_iterable_to_json(data, f, pretty_print=True)
+        TracedDataJsonIO.export_traced_data_iterable_to_json(show_messages, f, pretty_print=True)
 
-    # Output to a more human-friendly CSV.
-    if os.path.dirname(csv_output_path) is not "" and not os.path.exists(os.path.dirname(csv_output_path)):
-        os.makedirs(os.path.dirname(csv_output_path))
-    with open(csv_output_path, "w") as f:
-        TracedDataCSVIO.export_traced_data_iterable_to_csv(
-            data, f, headers=[
-                "avf_phone_id",
-                "{} (Run ID) - {}".format(variable_name, flow_name),
-                "{} (Time) - {}".format(variable_name, flow_name),
-                "{} (Text) - {}".format(variable_name, flow_name)
-            ]
-        )
+    # Output to The Interface
+    IOUtils.ensure_dirs_exist(interface_output_dir)
+    TracedDataTheInterfaceIO.export_traced_data_iterable_to_the_interface(
+        show_messages, interface_output_dir, "avf_phone_id", "{} (Text) - {}".format(variable_name, flow_name),
+        "{} (Time EAT) - {}".format(variable_name, flow_name)
+    )
 
     # Output messages to Coda
     IOUtils.ensure_dirs_exist_for_file(coda_output_path)
     with open(coda_output_path, "w") as f:
         TracedDataCodaIO.export_traced_data_iterable_to_coda(
-            data, "{} (Text) - {}".format(variable_name, flow_name), f)
+            show_messages, "{} (Text) - {}".format(variable_name, flow_name), f)

@@ -19,10 +19,8 @@ cd "$RP_DIR"
 mkdir -p "$DATA_ROOT/01 Raw Messages"
 
 SHOWS=(
-    "wt_s06e1_activation"
-    "wt_s06e2_activation"
-    "wt_s06e03_activation"
     "wt_s06e04_activation"
+#    "esc4jmcna_activation"
     )
 
 for SHOW in ${SHOWS[@]}
