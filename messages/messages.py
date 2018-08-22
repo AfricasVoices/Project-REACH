@@ -41,22 +41,22 @@ if __name__ == "__main__":
     # TODO (Somewhere): Filter out test messages sent by AVF.
 
     # Filter for runs which contain a response to this week's question.
-    show_messages = [td for td in show_messages if "{} (Text) - {}".format(variable_name, flow_name) in td]
+    show_message_key = "{} (Text) - {}".format(variable_name, flow_name)
+    show_messages = [td for td in show_messages if show_message_key in td]
 
     # Convert date/time of messages to EAT
+    utc_key = "{} (Time) - {}".format(variable_name, flow_name)
+    eat_key = "{} (Time EAT) - {}".format(variable_name, flow_name)
     for td in show_messages:
-        utc_key = "{} (Time) - {}".format(variable_name, flow_name)
-        eat_key = "{} (Time EAT) - {}".format(variable_name, flow_name)
-
         utc_time = isoparse(td[utc_key])
         eat_time = utc_time.astimezone(pytz.timezone("Africa/Nairobi")).isoformat()
 
         td.append_data(
-            {"{} (Time EAT) - {}".format(variable_name, flow_name): eat_time},
+            {eat_key: eat_time},
             Metadata(user, Metadata.get_call_location(), time.time())
         )
 
-    # Write json output
+    # Output to JSON
     IOUtils.ensure_dirs_exist_for_file(json_output_path)
     with open(json_output_path, "w") as f:
         TracedDataJsonIO.export_traced_data_iterable_to_json(show_messages, f, pretty_print=True)
@@ -64,9 +64,7 @@ if __name__ == "__main__":
     # Output to The Interface
     IOUtils.ensure_dirs_exist(interface_output_dir)
     TracedDataTheInterfaceIO.export_traced_data_iterable_to_the_interface(
-        show_messages, interface_output_dir, "avf_phone_id", "{} (Text) - {}".format(variable_name, flow_name),
-        "{} (Time EAT) - {}".format(variable_name, flow_name)
-    )
+        show_messages, interface_output_dir, "avf_phone_id", show_message_key, eat_key)
 
     # Output messages to Coda
     IOUtils.ensure_dirs_exist_for_file(coda_output_path)
