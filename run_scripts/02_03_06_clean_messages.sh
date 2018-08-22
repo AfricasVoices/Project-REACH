@@ -4,7 +4,7 @@ set -e
 
 if [ $# -ne 2 ]; then
     echo "Usage: sh 02_03_06_clean_messages.sh <user> <data-root>"
-    echo "Cleans radio show answers, and exports to CSVs for analysis."
+    echo "Cleans radio show answers, and exports to The Interface and to Coda for analysis."
     exit
 fi
 
@@ -18,8 +18,7 @@ mkdir -p "$DATA_ROOT/03 Interface Files"
 mkdir -p "$DATA_ROOT/06 Coda Files"
 
 SHOWS=(
-    "wt_s06e04_activation" S06E04_Cholera_Recurrency
-#    "esc4jmcna_activation" S07E01_Humanitarian_Priorities
+    "esc4jmcna_activation" S07E01_Humanitarian_Priorities
     )
 
 for i in $(seq 0 $((${#SHOWS[@]} / 2 - 1)))
