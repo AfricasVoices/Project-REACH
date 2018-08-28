@@ -16,6 +16,6 @@ cd ../survey_auto_code
 mkdir -p "$DATA_ROOT/05 Auto-Coded"
 mkdir -p "$DATA_ROOT/06 Coda Files"
 
-sh docker-run.sh "$USER" "$DATA_ROOT/04 Raw Surveys/wt_demog_1.json" "$DATA_ROOT/04 Raw Surveys/wt_demog_2.json" \
-    "$DATA_ROOT/04 Raw Surveys/wt_practice.json" "$DATA_ROOT/09 Coded Coda Files/" \
+sh docker-run.sh "$USER" "$DATA_ROOT/04 Raw Surveys/esc4jmcna_demog.json" \
+    "$DATA_ROOT/04 Raw Surveys/esc4jmcna_evaluation.json" "$DATA_ROOT/09 Coded Coda Files/" \
     "$DATA_ROOT/05 Auto-Coded/surveys.json" "$DATA_ROOT/06 Coda Files/"
