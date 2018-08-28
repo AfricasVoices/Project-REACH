@@ -1,5 +1,9 @@
-# Wellcome-DfID Phase 2 (Somalia)
-Data pipeline stages and run scripts for the Wellcome Trust/Department for International Development project in Somalia.
+# REACH
+Data pipeline stages and run scripts for REACH.
+
+Note that this repository is a fork of 
+[Wellcome_Dfid_Somalia](https://github.com/AfricasVoices/Wellcome_Dfid_Somalia). 
+Migration of this code base to support REACH instead of Wellcome is still a work in progress.
 
 ## Usage
 ### Prerequisites
