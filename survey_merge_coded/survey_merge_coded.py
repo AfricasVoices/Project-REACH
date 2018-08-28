@@ -1,10 +1,9 @@
 import argparse
-import os
 import time
 from os import path
 
 from core_data_modules.traced_data import Metadata
-from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCodaIO, TracedDataCodingCSVIO
+from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCodaIO
 from core_data_modules.util import IOUtils
 
 if __name__ == "__main__":
@@ -24,19 +23,15 @@ if __name__ == "__main__":
     json_output_path = args.json_output_path
 
     survey_keys = [
-        "District (Text) - wt_demog_1",
-        "Gender (Text) - wt_demog_1",
-        "Urban_Rural (Text) - wt_demog_1",
+        "District (Text) - esc4jmcna_demog",
+        "Urban_Rural (Text) - esc4jmcna_demog",
+        "Idp (Text) - esc4jmcna_demog",
+        "Age (Text) - esc4jmcna_demog",
+        "Gender (Text) - esc4jmcna_demog",
+        "Livelihood (Text) - esc4jmcna_demog",
 
-        "Radio_Station (Text) - wt_demog_2",
-        "Age (Text) - wt_demog_2",
-        "Education_Level (Text) - wt_demog_2",
-        "Idp (Text) - wt_demog_2",
-        "Origin_District (Text) - wt_demog_2",
-
-        "Cholera_Vaccination (Text) - wt_practice",
-        "Household_Sickness (Text) - wt_practice",
-        "Trustworthy_Advisors (Text) - wt_practice"
+        "Involved (Text) - esc4jmcna_evaluation",
+        "Repeated (Text) - esc4jmcna_evaluation"
     ]
 
     # Load data from JSON file
