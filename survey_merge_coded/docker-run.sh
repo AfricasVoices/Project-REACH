@@ -2,7 +2,7 @@
 
 set -e
 
-IMAGE_NAME=wt-survey-merge-coded
+IMAGE_NAME=esc4jmcna-survey-merge-coded
 
 # Check that the correct number of arguments were provided.
 if [ $# -ne 4 ]; then
