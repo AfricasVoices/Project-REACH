@@ -2,7 +2,7 @@
 
 set -e
 
-IMAGE_NAME=wt-survey-auto-code
+IMAGE_NAME=esc4jmcna-survey-auto-code
 
 # Check that the correct number of arguments were provided.
 if [ $# -ne 6 ]; then
