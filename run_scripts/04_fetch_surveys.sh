@@ -3,7 +3,7 @@
 set -e
 
 if [ $# -ne 5 ]; then
-    echo "Usage: sh 01_fetch_messages.sh <user> <rapid-pro-root> <rapid-pro-server> <rapid-pro-token> <data-root>"
+    echo "Usage: sh 04_fetch_surveys.sh <user> <rapid-pro-root> <rapid-pro-server> <rapid-pro-token> <data-root>"
     echo "Downloads radio show answers from each show"
     exit
 fi
@@ -19,9 +19,8 @@ cd "$RP_DIR"
 mkdir -p "$DATA_ROOT/04 Raw Surveys"
 
 SURVEYS=(
-    "wt_demog_1"
-    "wt_demog_2"
-    "wt_practice"
+    "esc4jmcna_demog"
+    "esc4jmcna_evaluation"
     )
 
 for SURVEY in ${SURVEYS[@]}

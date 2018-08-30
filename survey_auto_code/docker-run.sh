@@ -2,23 +2,22 @@
 
 set -e
 
-IMAGE_NAME=wt-survey-auto-code
+IMAGE_NAME=esc4jmcna-survey-auto-code
 
 # Check that the correct number of arguments were provided.
-if [ $# -ne 7 ]; then
-    echo "Usage: sh docker-run.sh <user> <demog-1-input-path> <demog-2-input-path> <practice-input-path> <prev-coded-path> <json-output-path> <coded-output-path>"
+if [ $# -ne 6 ]; then
+    echo "Usage: sh docker-run.sh <user> <demog-input-path> <evaluation-input-path> <prev-coded-path> <json-output-path> <coded-output-path>"
     echo "Note: The file at <prev-coded-output> need not exist for this script to run"
     exit
 fi
 
 # Assign the program arguments to bash variables.
 USER=$1
-INPUT_DEMOG_1=$2
-INPUT_DEMOG_2=$3
-INPUT_PRACTICE=$4
-PREV_CODED_DIR=$5
-OUTPUT_JSON=$6
-CODED_DIR=$7
+INPUT_DEMOG=$2
+INPUT_PRACTICE=$3
+PREV_CODED_DIR=$4
+OUTPUT_JSON=$5
+CODED_DIR=$6
 
 # Build an image for this pipeline stage.
 docker build -t "$IMAGE_NAME" .
@@ -33,9 +32,8 @@ function finish {
 trap finish EXIT
 
 # Copy input data into the container
-docker cp "$INPUT_DEMOG_1" "$container:/data/input-demog-1.json"
-docker cp "$INPUT_DEMOG_2" "$container:/data/input-demog-2.json"
-docker cp "$INPUT_PRACTICE" "$container:/data/input-practice.json"
+docker cp "$INPUT_DEMOG" "$container:/data/input-demog.json"
+docker cp "$INPUT_PRACTICE" "$container:/data/input-evaluation.json"
 if [ -d "$PREV_CODED_DIR" ]; then
     docker cp "$PREV_CODED_DIR" "$container:/data/prev-coded"
 fi
