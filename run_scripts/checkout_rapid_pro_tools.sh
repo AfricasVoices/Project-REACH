@@ -3,29 +3,29 @@
 set -e
 
 if [ $# -ne 1 ]; then
-    echo "Usage: sh checkout_rapid_pro_tools.sh <rapid-pro-dir>"
-    echo "Ensures that a copy of the RapidProTools project exists in  'rapid-pro-root' by cloning/fetching as, "
+    echo "Usage: sh checkout_rapid_pro_tools.sh <rapid-pro-tools-dir>"
+    echo "Ensures that a copy of the RapidProTools project exists in  'rapid-pro-tools-dir' by cloning/fetching as, "
     echo "necessary, and checking-out the version needed by this project"
     exit
 fi
 
-RAPID_PRO_DIR="$1"
+RAPID_PRO_TOOLS_DIR="$1"
 
-RAPID_PRO_REPO="https://github.com/AfricasVoices/RapidProTools.git"
+RAPID_PRO_TOOLS_REPO="https://github.com/AfricasVoices/RapidProTools.git"
 TAG="43d8b4d49a3be5935069d48db5250f33c81bd924"
 
-mkdir -p "$RAPID_PRO_DIR"
-cd "$RAPID_PRO_DIR"
+mkdir -p "$RAPID_PRO_TOOLS_DIR"
+cd "$RAPID_PRO_TOOLS_DIR"
 
-# If the RAPID_PRO_DIR does not contain a git repository, clone the rapid pro repo
+# If the RAPID_PRO_DIR does not contain a git repository, clone the rapid pro tools repo
 if ! [ -d .git ]; then
-    git clone "$RAPID_PRO_REPO" .
+    git clone "$RAPID_PRO_TOOLS_REPO" .
 fi
 
 # Check that this repository is connected to the correct remote.
 # (this ensures we are in the correct repository and can fetch new changes later if we need to)
-if [ $(git config --get remote.origin.url) != "$RAPID_PRO_REPO" ]; then
-    echo "Error: Git repository in RAPID_PRO_ROOT does not have its origin set to $RAPID_PRO_REPO"
+if [ $(git config --get remote.origin.url) != "$RAPID_PRO_TOOLS_REPO" ]; then
+    echo "Error: Git repository in RAPID_PRO_ROOT does not have its origin set to $RAPID_PRO_TOOLS_REPO"
     exit 1
 fi
 
