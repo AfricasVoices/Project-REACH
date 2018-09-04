@@ -6,6 +6,7 @@ import time
 from core_data_modules.cleaners import Codes
 from core_data_modules.traced_data import Metadata, TracedData
 from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCSVIO
+from core_data_modules.util import IOUtils
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Joins radio show answers with survey answers on respondents' "
@@ -33,32 +34,9 @@ if __name__ == "__main__":
     json_output_path = args.json_output_path
     csv_output_path = args.csv_output_path
 
-    message_keys = [
-        "avf_phone_id",
-        "{} (Run ID) - {}".format(variable_name, flow_name),
-        "{} (Time) - {}".format(variable_name, flow_name),
-        "{} (Text) - {}".format(variable_name, flow_name)
-    ]
-
-    survey_keys = [
-        "District (Text) - wt_demog_1",
-        "Gender (Text) - wt_demog_1",
-        "Urban_Rural (Text) - wt_demog_1",
-
-        "Radio_Station (Text) - wt_demog_2",
-        "Age (Text) - wt_demog_2",
-        "Education_Level (Text) - wt_demog_2",
-        "Idp (Text) - wt_demog_2",
-        "Origin_District (Text) - wt_demog_2",
-
-        "Cholera_Vaccination (Text) - wt_practice",
-        "Household_Sickness (Text) - wt_practice",
-        "Trustworthy_Advisors (Text) - wt_practice"
-    ]
-
     # Load messages
     with open(json_input_path, "r") as f:
-        data = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
+        messages = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
 
     # Load surveys
     with open(survey_input_path, "r") as f:
@@ -67,23 +45,12 @@ if __name__ == "__main__":
     # Add survey data to the messages
     TracedData.update_iterable(user, "avf_phone_id", data, surveys, "survey_responses")
 
-    # Mark missing survey entries in the raw data as true missing
-    for td in data:
-        for key in survey_keys:
-            if key not in td:
-                td.append_data({key: Codes.TRUE_MISSING}, Metadata(user, Metadata.get_call_location(), time.time()))
+    TracedData.update_iterable(user, "avf_phone_id", messages, surveys, "survey_responses")
 
     # Write json output
-    if os.path.dirname(json_output_path) is not "" and not os.path.exists(os.path.dirname(json_output_path)):
-        os.makedirs(os.path.dirname(json_output_path))
+    IOUtils.ensure_dirs_exist_for_file(json_output_path)
     with open(json_output_path, "w") as f:
-        TracedDataJsonIO.export_traced_data_iterable_to_json(data, f, pretty_print=True)
+        TracedDataJsonIO.export_traced_data_iterable_to_json(messages, f, pretty_print=True)
 
-    # Output to CSV for analysis
-    export_keys = list(message_keys)
-    export_keys.extend(survey_keys)
-
-    if os.path.dirname(csv_output_path) is not "" and not os.path.exists(os.path.dirname(csv_output_path)):
-        os.makedirs(os.path.dirname(csv_output_path))
     with open(csv_output_path, "w") as f:
-        TracedDataCSVIO.export_traced_data_iterable_to_csv(data, f, headers=export_keys)
+        f.write("{}")

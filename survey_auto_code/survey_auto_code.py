@@ -32,61 +32,74 @@ if __name__ == "__main__":
     json_output_path = args.json_output_path
     coded_output_path = args.coded_output_path
 
-    cleaning_plan = {
-        "District (Text) - esc4jmcna_demog": somali.DemographicCleaner.clean_somalia_district,
-        "Urban_Rural (Text) - esc4jmcna_demog": somali.DemographicCleaner.clean_urban_rural,
-        "Idp (Text) - esc4jmcna_demog": somali.DemographicCleaner.clean_yes_no,
-        "Age (Text) - esc4jmcna_demog": somali.DemographicCleaner.clean_age,
-        "Gender (Text) - esc4jmcna_demog": somali.DemographicCleaner.clean_gender,
-        "Livelihood (Text) - esc4jmcna_demog": None,
+    class CleaningPlan:
+        def __init__(self, raw_field, clean_field, coded_field, prev_coded_field, coda_name, cleaner):
+            self.raw_field = raw_field
+            self.clean_field = clean_field
+            self.coded_field = coded_field
+            self.prev_coded_field = prev_coded_field
+            self.coda_name = coda_name
+            self.cleaner = cleaner
 
-        "Involved (Text) - esc4jmcna_evaluation": somali.DemographicCleaner.clean_yes_no,
-        "Repeated (Text) - esc4jmcna_evaluation": somali.DemographicCleaner.clean_yes_no
-    }
+    cleaning_plan = [
+        CleaningPlan("district_review", "district_clean", "district_coded", "district", "District",
+                     somali.DemographicCleaner.clean_somalia_district),
+        CleaningPlan("urban_rural_review", "urban_rural_clean", "urban_rural_coded", "urban_rural", "Urban_Rural",
+                     somali.DemographicCleaner.clean_urban_rural),
+
+        CleaningPlan("involved_esc4jmcna", "involved_esc4jmcna_clean", "involved_esc4jmcna_coded", None, "Involved",
+                     None),
+        CleaningPlan("repeated_esc4jmcna", "repeated_esc4jmcna_clean", "repeated_esc4jmcna_coded", None, "Repeated",
+                     None)
+    ]
 
     # Load data from JSON file
     with open(demog_input_path, "r") as f:
-        demog_data = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
-    with open(evaluation_input_path, "r") as f:
-        evaluation_data = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
+        contacts = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
 
-    # Join the survey data on "avf_phone_id"
-    all_survey_data = TracedData.join_iterables(
-        user, "avf_phone_id", demog_data, evaluation_data, "esc4jmcna_evaluation")
-
-    # Clean the survey responses
-    for td in all_survey_data:
-        cleaned = dict()
-        for key, cleaner in cleaning_plan.items():
-            if cleaner is not None and key in td:
-                cleaned["{}_clean".format(key)] = cleaner(td[key])
-        td.append_data(cleaned, Metadata(user, Metadata.get_call_location(), time.time()))
+    # Filter out test messages sent by AVF
+    # contacts = [td for td in contacts if not td.get("test_run", False)]
 
     # Mark missing entries in the raw data as true missing
-    for td in all_survey_data:
+    for td in contacts:
         missing = dict()
-        for key in cleaning_plan:
-            if key not in td:
-                missing[key] = Codes.TRUE_MISSING
+        for plan in cleaning_plan:
+            if plan.raw_field not in td:
+                missing[plan.raw_field] = Codes.TRUE_MISSING
         td.append_data(missing, Metadata(user, Metadata.get_call_location(), time.time()))
+
+    # Clean all responses
+    for td in contacts:
+        cleaned = dict()
+        for plan in cleaning_plan:
+            if plan.cleaner is not None:
+                cleaned[plan.clean_field] = plan.cleaner(td[plan.raw_field])
+        td.append_data(cleaned, Metadata(user, Metadata.get_call_location(), time.time()))
+
+    # Apply previously set codes
+    for td in contacts:
+        prev_coded = dict()
+        for plan in cleaning_plan:
+            if plan.prev_coded_field is not None:
+                prev_coded[plan.coded_field] = td.get(plan.prev_coded_field)
+        td.append_data(prev_coded, Metadata(user, Metadata.get_call_location(), time.time()))
 
     # Write json output
     IOUtils.ensure_dirs_exist_for_file(json_output_path)
     with open(json_output_path, "w") as f:
-        TracedDataJsonIO.export_traced_data_iterable_to_json(all_survey_data, f, pretty_print=True)
+        TracedDataJsonIO.export_traced_data_iterable_to_json(contacts, f, pretty_print=True)
 
     # Output for manual verification + coding
     IOUtils.ensure_dirs_exist(coded_output_path)
-    # TODO: Tidy up the usage of keys here once the format of the keys has been updated.
-    for key in cleaning_plan.keys():
-        coded_output_file_path = path.join(coded_output_path, "{}.csv".format(key.split(" ")[0]))
-        prev_coded_output_file_path = path.join(prev_coded_path, "{}_coded.csv".format(key.split(" ")[0]))
+    for plan in cleaning_plan:
+        coded_output_file_path = path.join(coded_output_path, "{}.csv".format(plan.coda_name))
+        prev_coded_output_file_path = path.join(prev_coded_path, "{}_coded.csv".format(plan.coda_name))
 
         if os.path.exists(prev_coded_output_file_path):
             with open(coded_output_file_path, "w") as f, open(prev_coded_output_file_path, "r") as prev_f:
                 TracedDataCodaIO.export_traced_data_iterable_to_coda_with_scheme(
-                    all_survey_data, key, {key.split(" ")[0]: "{}_clean".format(key)}, f, prev_f)
+                    contacts, plan.raw_field, {plan.coda_name: plan.clean_field}, f, prev_f)
         else:
             with open(coded_output_file_path, "w") as f:
                 TracedDataCodaIO.export_traced_data_iterable_to_coda_with_scheme(
-                    all_survey_data, key, {key.split(" ")[0]: "{}_clean".format(key)}, f)
+                    contacts, plan.raw_field, {plan.coda_name: plan.clean_field}, f)

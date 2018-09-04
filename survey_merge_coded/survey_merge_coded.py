@@ -12,7 +12,7 @@ if __name__ == "__main__":
     parser.add_argument("json_input_path", metavar="json-input-path",
                         help="Path to JSON input file, which contains a list of TracedData objects")
     parser.add_argument("coded_input_path", metavar="coded-input-path",
-                        help="Directory to read coding files from")
+                        help="Directory to read manually-coded Coda files from")
     parser.add_argument("json_output_path", metavar="json-output-path",
                         help="Path to a JSON file to write merged results to")
 
@@ -22,16 +22,14 @@ if __name__ == "__main__":
     coded_input_path = args.coded_input_path
     json_output_path = args.json_output_path
 
-    survey_keys = [
-        "District (Text) - esc4jmcna_demog",
-        "Urban_Rural (Text) - esc4jmcna_demog",
-        "Idp (Text) - esc4jmcna_demog",
-        "Age (Text) - esc4jmcna_demog",
-        "Gender (Text) - esc4jmcna_demog",
-        "Livelihood (Text) - esc4jmcna_demog",
+    class MergePlan:
+        def __init__(self, raw_field, coded_field, coda_name):
+            self.raw_field = raw_field
+            self.coded_field = coded_field
+            self.coda_name = coda_name
 
-        "Involved (Text) - esc4jmcna_evaluation",
-        "Repeated (Text) - esc4jmcna_evaluation"
+    merge_plan = [
+        MergePlan("district_review", "district", "District")
     ]
 
     # Load data from JSON file
@@ -39,21 +37,21 @@ if __name__ == "__main__":
         surveys = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
 
     # Merge manually coded Coda files into the cleaned dataset
-    for key in survey_keys:
-        coda_file_path = path.join(coded_input_path, "{}_coded.csv".format(key.split(" ")[0]))
+    for plan in merge_plan:
+        coda_file_path = path.join(coded_input_path, "{}_coded.csv".format(plan.coda_name))
 
         if not path.exists(coda_file_path):
-            print("Warning: No Coda file found for key '{}'".format(key))
+            print("Warning: No Coda file found for key '{}'".format(plan.coda_name))
             for td in surveys:
                 td.append_data(
-                    {"{}_coded".format(key): None},
+                    {plan.coded_field: None},
                     Metadata(user, Metadata.get_call_location(), time.time())
                 )
             continue
 
         with open(coda_file_path, "r") as f:
             TracedDataCodaIO.import_coda_to_traced_data_iterable(
-                user, surveys, key, {key.split(" ")[0]: "{}_coded".format(key)}, f, True)
+                user, surveys, plan.raw_field, {plan.coda_name: "{}_coded".format(plan.coded_field)}, f, True)
 
     # Write coded data back out to disk
     IOUtils.ensure_dirs_exist_for_file(json_output_path)

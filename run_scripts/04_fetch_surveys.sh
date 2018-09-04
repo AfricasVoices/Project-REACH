@@ -16,20 +16,11 @@ DATA_ROOT=$5
 
 TEST_CONTACTS_PATH="$(pwd)/test_contacts.json"
 
-cd "$RP_DIR"
+cd "$RP_DIR/fetch_contacts"
 
-mkdir -p "$DATA_ROOT/04 Raw Surveys"
+mkdir -p "$DATA_ROOT/04 Raw Surveys"  # TODO: Rename to e.g. raw contacts?
 
-SURVEYS=(
-    "esc4jmcna_demog"
-    "esc4jmcna_evaluation"
-    )
+echo "Exporting contacts"
 
-for SURVEY in ${SURVEYS[@]}
-do
-    echo "Exporting survey $SURVEY"
-
-    sh docker-run.sh  --flow-name "$SURVEY" --test-contacts-path "$TEST_CONTACTS_PATH" \
-        "$RP_SERVER" "$RP_TOKEN" "$USER" latest-only \
-        "$DATA_ROOT/00 UUIDs/phone_uuids.json" "$DATA_ROOT/04 Raw Surveys/$SURVEY.json"
-done
+sh docker-run.sh --test-contacts-path "$TEST_CONTACTS_PATH" "$RP_SERVER" "$RP_TOKEN" "$USER" \
+    "$DATA_ROOT/00 UUIDs/phone_uuids.json" "$DATA_ROOT/04 Raw Surveys/contacts.json"

@@ -16,7 +16,7 @@ DATA_ROOT=$5
 
 TEST_CONTACTS_PATH="$(pwd)/test_contacts.json"
 
-cd "$RP_DIR"
+cd "$RP_DIR/fetch_runs"
 
 mkdir -p "$DATA_ROOT/01 Raw Messages"
 
