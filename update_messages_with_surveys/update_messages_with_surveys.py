@@ -16,23 +16,14 @@ if __name__ == "__main__":
                         help="Path to the input messages JSON file, containing a list of serialized TracedData objects")
     parser.add_argument("survey_input_path", metavar="survey-input-path",
                         help="Path to the cleaned survey JSON file, containing a list of serialized TracedData objects")
-    parser.add_argument("flow_name", metavar="flow-name",
-                        help="Name of activation flow from which this data was derived")
-    parser.add_argument("variable_name", metavar="variable-name",
-                        help="Name of message variable in flow")
     parser.add_argument("json_output_path", metavar="json-output-path",
                         help="Path to a JSON file to write processed messages to")
-    parser.add_argument("csv_output_path", metavar="csv-output-path",
-                        help="Path to a CSV file to write the joined dataset to")
 
     args = parser.parse_args()
     user = args.user
     json_input_path = args.json_input_path
     survey_input_path = args.survey_input_path
-    variable_name = args.variable_name
-    flow_name = args.flow_name
     json_output_path = args.json_output_path
-    csv_output_path = args.csv_output_path
 
     # Load messages
     with open(json_input_path, "r") as f:
@@ -42,8 +33,21 @@ if __name__ == "__main__":
     with open(survey_input_path, "r") as f:
         surveys = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
 
+    # TODO: Delete
+    surveys = [td for td in surveys if td["avf_phone_id"] != "avf-phone-uuid-a23e99ba-b6ce-47fc-ab95-8d1cfe7558cf"]
+
     # Add survey data to the messages
-    TracedData.update_iterable(user, "avf_phone_id", data, surveys, "survey_responses")
+    # seen_ids = set()
+    # for td in surveys:
+    #     if td["avf_phone_id"] not in seen_ids:
+    #         seen_ids.add(td["avf_phone_id"])
+    #     else:
+    #         print("Duplicate id: {}".format(td["avf_phone_id"]))
+    #
+    # update_id_key = "avf_phone_id"
+    # updates = surveys
+    # updates_lut = {update_td[update_id_key]: update_td for update_td in updates}
+    # print(len(updates), len(updates_lut))
 
     TracedData.update_iterable(user, "avf_phone_id", messages, surveys, "survey_responses")
 
@@ -51,6 +55,3 @@ if __name__ == "__main__":
     IOUtils.ensure_dirs_exist_for_file(json_output_path)
     with open(json_output_path, "w") as f:
         TracedDataJsonIO.export_traced_data_iterable_to_json(messages, f, pretty_print=True)
-
-    with open(csv_output_path, "w") as f:
-        f.write("{}")
