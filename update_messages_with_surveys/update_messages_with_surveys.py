@@ -1,11 +1,7 @@
 import argparse
-import csv
-import os
-import time
 
-from core_data_modules.cleaners import Codes
-from core_data_modules.traced_data import Metadata, TracedData
-from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCSVIO
+from core_data_modules.traced_data import TracedData
+from core_data_modules.traced_data.io import TracedDataJsonIO
 from core_data_modules.util import IOUtils
 
 if __name__ == "__main__":
@@ -34,21 +30,22 @@ if __name__ == "__main__":
         surveys = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
 
     # TODO: Delete
-    surveys = [td for td in surveys if td["avf_phone_id"] != "avf-phone-uuid-a23e99ba-b6ce-47fc-ab95-8d1cfe7558cf"]
+    # surveys = [td for td in surveys
+    #            if td["avf_phone_id"] != "avf-phone-uuid-a23e99ba-b6ce-47fc-ab95-8d1cfe7558cf" and
+    #               td["avf_phone_id"] != "avf-phone-uuid-f5e448b8-40cd-4b3f-bc42-57d5dc278fdd"]
+    seen_ids = set()
+    for td in surveys:
+        if td["avf_phone_id"] not in seen_ids:
+            seen_ids.add(td["avf_phone_id"])
+        else:
+            print("Duplicate id: {}".format(td["avf_phone_id"]))
+
+    update_id_key = "avf_phone_id"
+    updates = surveys
+    updates_lut = {update_td[update_id_key]: update_td for update_td in updates}
+    print(len(updates), len(updates_lut))
 
     # Add survey data to the messages
-    # seen_ids = set()
-    # for td in surveys:
-    #     if td["avf_phone_id"] not in seen_ids:
-    #         seen_ids.add(td["avf_phone_id"])
-    #     else:
-    #         print("Duplicate id: {}".format(td["avf_phone_id"]))
-    #
-    # update_id_key = "avf_phone_id"
-    # updates = surveys
-    # updates_lut = {update_td[update_id_key]: update_td for update_td in updates}
-    # print(len(updates), len(updates_lut))
-
     TracedData.update_iterable(user, "avf_phone_id", messages, surveys, "survey_responses")
 
     # Write json output

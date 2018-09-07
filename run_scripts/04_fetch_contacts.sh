@@ -3,8 +3,8 @@
 set -e
 
 if [ $# -ne 5 ]; then
-    echo "Usage: sh 04_fetch_surveys.sh <user> <rapid-pro-root> <rapid-pro-server> <rapid-pro-token> <data-root>"
-    echo "Downloads radio show answers from each show"
+    echo "Usage: sh 04_fetch_contacts.sh <user> <rapid-pro-root> <rapid-pro-server> <rapid-pro-token> <data-root>"
+    echo "Downloads all contacts from Rapid Pro"
     exit
 fi
 
@@ -18,7 +18,7 @@ TEST_CONTACTS_PATH="$(pwd)/test_contacts.json"
 
 cd "$RP_DIR/fetch_contacts"
 
-mkdir -p "$DATA_ROOT/04 Raw Contacts"  # TODO: Rename to e.g. raw contacts?
+mkdir -p "$DATA_ROOT/04 Raw Contacts"
 
 echo "Exporting contacts"
 
