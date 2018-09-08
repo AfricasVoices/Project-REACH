@@ -7,11 +7,11 @@ class FoldData(object):
     # TODO: Move this class to Core Data?
 
     @staticmethod
-    def group_by(data, key):
+    def group_by(data, key_fn):
         grouped_lut = dict()
 
         for td in data:
-            key = key(td)
+            key = key_fn(td)
             if key not in grouped_lut:
                 grouped_lut[key] = []
             grouped_lut[key].append(td)
