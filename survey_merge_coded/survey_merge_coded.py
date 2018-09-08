@@ -29,8 +29,11 @@ if __name__ == "__main__":
             self.coda_name = coda_name
 
     merge_plan = [
-        MergePlan("district_review", "district_coded", "District"),
         MergePlan("gender_review", "gender_coded", "Gender"),
+        MergePlan("district_review", "district_coded", "District"),
+        MergePlan("age_review", "age_coded", "Age"),
+        MergePlan("assessment_review", "assessment_coded", "Assessment"),
+        MergePlan("idp_review", "idp_coded", "IDP"),
 
         MergePlan("involved_esc4jmcna", "involved_esc4jmcna_coded", "Involved"),
         MergePlan("repeated_esc4jmcna", "repeated_esc4jmcna_coded", "Repeated")
@@ -40,7 +43,7 @@ if __name__ == "__main__":
     with open(json_input_path, "r") as f:
         data = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
 
-    # Merge manually coded suvey/evaluation Coda files into the cleaned dataset
+    # Merge manually coded survey/evaluation Coda files into the cleaned dataset
     for plan in merge_plan:
         coda_file_path = path.join(coded_input_path, "{}_coded.csv".format(plan.coda_name))
 

@@ -30,24 +30,28 @@ if __name__ == "__main__":
     coded_output_path = args.coded_output_path
 
     class CleaningPlan:
-        def __init__(self, raw_field, clean_field, coded_field, prev_coded_field, coda_name, cleaner):
+        def __init__(self, raw_field, clean_field, coda_name, cleaner):
             self.raw_field = raw_field
             self.clean_field = clean_field
-            self.coded_field = coded_field
-            self.prev_coded_field = prev_coded_field
             self.coda_name = coda_name
             self.cleaner = cleaner
 
     cleaning_plan = [
-        CleaningPlan("district_review", "district_clean", "district_coded", "district", "District",
+        CleaningPlan("gender_review", "gender_clean", "Gender",
+                     somali.DemographicCleaner.clean_gender),
+        CleaningPlan("district_review", "district_clean", "District",
                      somali.DemographicCleaner.clean_somalia_district),
-        CleaningPlan("urban_rural_review", "urban_rural_clean", "urban_rural_coded", "urban_rural", "Urban_Rural",
-                     somali.DemographicCleaner.clean_urban_rural),
+        CleaningPlan("age_review", "age_clean", "Age",
+                     somali.DemographicCleaner.clean_age),
+        CleaningPlan("assessment_review", "assessment_clean", "Assessment",
+                     somali.DemographicCleaner.clean_yes_no),
+        CleaningPlan("idp_review", "idp_clean", "IDP",
+                     somali.DemographicCleaner.clean_yes_no),
 
-        CleaningPlan("involved_esc4jmcna", "involved_esc4jmcna_clean", "involved_esc4jmcna_coded", None, "Involved",
-                     None),
-        CleaningPlan("repeated_esc4jmcna", "repeated_esc4jmcna_clean", "repeated_esc4jmcna_coded", None, "Repeated",
-                     None)
+        CleaningPlan("involved_esc4jmcna", "involved_esc4jmcna_clean", "Involved",
+                     somali.DemographicCleaner.clean_yes_no),
+        CleaningPlan("repeated_esc4jmcna", "repeated_esc4jmcna_clean", "Repeated",
+                     somali.DemographicCleaner.clean_yes_no)
     ]
 
     # Load data from JSON file
@@ -55,7 +59,7 @@ if __name__ == "__main__":
         data = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
 
     # Filter out test messages sent by AVF
-    # contacts = [td for td in contacts if not td.get("test_run", False)]
+    contacts = [td for td in data if not td.get("test_run", False)]
 
     # Mark missing entries in the raw data as true missing
     for td in data:
@@ -72,14 +76,6 @@ if __name__ == "__main__":
             if plan.cleaner is not None:
                 cleaned[plan.clean_field] = plan.cleaner(td[plan.raw_field])
         td.append_data(cleaned, Metadata(user, Metadata.get_call_location(), time.time()))
-
-    # Apply previously set codes
-    for td in data:
-        prev_coded = dict()
-        for plan in cleaning_plan:
-            if plan.prev_coded_field is not None and td.get(plan.prev_coded_field) is not None:
-                prev_coded[plan.coded_field] = td[plan.prev_coded_field]
-        td.append_data(prev_coded, Metadata(user, Metadata.get_call_location(), time.time()))
 
     # Write json output
     IOUtils.ensure_dirs_exist_for_file(json_output_path)
