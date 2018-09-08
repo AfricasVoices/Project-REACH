@@ -7,26 +7,28 @@ class FoldData(object):
     # TODO: Move this class to Core Data?
 
     @staticmethod
-    def group_by(data, collation_key_fn):
-        collated_lut = dict()
+    def group_by(data, key):
+        grouped_lut = dict()
 
         for td in data:
-            key = collation_key_fn(td)
-            if key not in collated_lut:
-                collated_lut[key] = []
-            collated_lut[key].append(td)
+            key = key(td)
+            if key not in grouped_lut:
+                grouped_lut[key] = []
+            grouped_lut[key].append(td)
 
-        return collated_lut.values()
+        return grouped_lut.values()
 
     @staticmethod
-    def process_grouped(collated_lists, collation_fn):
-        collated = []
-        for group in collated_lists:
-            collated_td = group.pop(0)
+    def process_grouped(grouped_lists, fold_fn):
+        folded_data = []
+
+        for group in grouped_lists:
+            folded_td = group.pop(0)
             while len(group) > 0:
-                collated_td = collation_fn(collated_td, group.pop(0))
-            collated.append(collated_td)
-        return collated
+                folded_td = fold_fn(folded_td, group.pop(0))
+            folded_data.append(folded_td)
+
+        return folded_data
 
     @staticmethod
     def assert_equal_keys_equal(td_1, td_2, equal_keys):
@@ -84,14 +86,14 @@ class FoldData(object):
         cls.set_other_keys_equal(user, td_1, set(td_1.keys()) - set(equal_keys))
         cls.set_other_keys_equal(user, td_2, set(td_2.keys()) - set(equal_keys))
 
-        collated_td = td_1.copy()
-        collated_td.append_traced_data("collated_other", td_2, Metadata(user, Metadata.get_call_location(), time.time()))
+        folded_td = td_1.copy()
+        folded_td.append_traced_data("folded_with", td_2, Metadata(user, Metadata.get_call_location(), time.time()))
 
-        return collated_td
+        return folded_td
 
     @classmethod
-    def fold(cls, user, data, collate_key_fn, equal_keys, concat_keys, matrix_keys, concat_delimiter=";"):
+    def fold(cls, user, data, group_by_fn, equal_keys, concat_keys, matrix_keys, concat_delimiter=";"):
         return cls.process_grouped(
-            FoldData.group_by(data, collate_key_fn),
+            FoldData.group_by(data, group_by_fn),
             lambda td_1, td_2: cls.fold_td(user, td_1, td_2, equal_keys, concat_keys, matrix_keys, concat_delimiter)
         )
