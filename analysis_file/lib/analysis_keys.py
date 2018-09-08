@@ -107,9 +107,9 @@ class AnalysisKeys(object):
             "idp": cls.get_code(td, "idp_review", "idp_coded"),
             "idp_raw": td.get("idp_review", Codes.TRUE_MISSING),
 
-            "involved_yes_no": cls.get_code(td, "involved_esc4jmcna", "involved_esc4jmcna_coded"),
+            "involved": cls.get_code(td, "involved_esc4jmcna", "involved_esc4jmcna_coded"),
             "involved_raw": td.get("involved_esc4jmcna", Codes.TRUE_MISSING),
 
-            "repeated_yes_no": cls.get_code(td, "repeated_esc4jmcna", "repeated_esc4jmcna_coded"),
+            "repeated": cls.get_code(td, "repeated_esc4jmcna", "repeated_esc4jmcna_coded"),
             "repeated_raw": td.get("repeated_esc4jmcna", Codes.TRUE_MISSING)
         }, Metadata(user, Metadata.get_call_location(), time.time()))
