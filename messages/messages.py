@@ -40,21 +40,21 @@ if __name__ == "__main__":
         show_messages = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
 
     # Filter out test messages sent by AVF.
-    # show_messages = [td for td in show_messages if not td.get("test_run", False)]
+    show_messages = [td for td in show_messages if not td.get("test_run", False)]
 
     # Filter for runs which contain a response to this week's question.
     show_message_key = "{} (Text) - {}".format(variable_name, flow_name)
     show_messages = [td for td in show_messages if show_message_key in td]
 
     # Filter out messages containing only noise
-    # print("Messages classed as noise:")
-    # not_noise = []
-    # for td in show_messages:
-    #     if somali.DemographicCleaner.is_noise(td[show_message_key]):
-    #         print(td[show_message_key])
-    #     else:
-    #         not_noise.append(td)
-    # show_messages = not_noise
+    print("Messages classed as noise:")
+    not_noise = []
+    for td in show_messages:
+        if somali.DemographicCleaner.is_noise(td[show_message_key]):
+            print(td[show_message_key])
+        else:
+            not_noise.append(td)
+    show_messages = not_noise
 
     # Convert date/time of messages to EAT
     utc_key = "{} (Time) - {}".format(variable_name, flow_name)
