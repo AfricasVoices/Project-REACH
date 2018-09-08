@@ -3,11 +3,11 @@ import time
 from core_data_modules.traced_data import Metadata
 
 
-class CollateData(object):
+class FoldData(object):
     # TODO: Move this class to Core Data?
 
     @staticmethod
-    def collate_by(data, collation_key_fn):
+    def group_by(data, collation_key_fn):
         collated_lut = dict()
 
         for td in data:
@@ -19,7 +19,7 @@ class CollateData(object):
         return collated_lut.values()
 
     @staticmethod
-    def process_collated(collated_lists, collation_fn):
+    def process_grouped(collated_lists, collation_fn):
         collated = []
         for group in collated_lists:
             collated_td = group.pop(0)
@@ -36,7 +36,7 @@ class CollateData(object):
                                                    "respectively)".format(key, td_1.get(key), td_2.get(key))
 
     @staticmethod
-    def collate_concat_keys(user, td_1, td_2, concat_keys, concat_delimiter=";"):
+    def fold_concat_keys(user, td_1, td_2, concat_keys, concat_delimiter=";"):
         for key in concat_keys:
             concat_dict = dict()
 
@@ -47,7 +47,7 @@ class CollateData(object):
             td_2.append_data(concat_dict, Metadata(user, Metadata.get_call_location(), time.time()))
 
     @staticmethod
-    def collate_matrix_keys(user, td_1, td_2, matrix_keys):
+    def fold_matrix_keys(user, td_1, td_2, matrix_keys):
         matrix_dict = dict()
         for key in matrix_keys:
             matrix_values = {"0", "1"}
@@ -72,10 +72,10 @@ class CollateData(object):
         td.append_data(other_dict, Metadata(user, Metadata.get_call_location(), time.time()))
 
     @classmethod
-    def collate_td(cls, user, td_1, td_2, equal_keys, concat_keys, matrix_keys, concat_delimiter=";"):
+    def fold_td(cls, user, td_1, td_2, equal_keys, concat_keys, matrix_keys, concat_delimiter=";"):
         cls.assert_equal_keys_equal(td_1, td_2, equal_keys)
-        cls.collate_concat_keys(user, td_1, td_2, concat_keys, concat_delimiter)
-        cls.collate_matrix_keys(user, td_1, td_2, matrix_keys)
+        cls.fold_concat_keys(user, td_1, td_2, concat_keys, concat_delimiter)
+        cls.fold_matrix_keys(user, td_1, td_2, matrix_keys)
 
         equal_keys = set(equal_keys)
         equal_keys.update(concat_keys)
@@ -90,8 +90,8 @@ class CollateData(object):
         return collated_td
 
     @classmethod
-    def collate(cls, user, data, collate_key_fn, equal_keys, concat_keys, matrix_keys, concat_delimiter=";"):
-        return cls.process_collated(
-            CollateData.collate_by(data, collate_key_fn),
-            lambda td_1, td_2: cls.collate_td(user, td_1, td_2, equal_keys, concat_keys, matrix_keys, concat_delimiter)
+    def fold(cls, user, data, collate_key_fn, equal_keys, concat_keys, matrix_keys, concat_delimiter=";"):
+        return cls.process_grouped(
+            FoldData.group_by(data, collate_key_fn),
+            lambda td_1, td_2: cls.fold_td(user, td_1, td_2, equal_keys, concat_keys, matrix_keys, concat_delimiter)
         )

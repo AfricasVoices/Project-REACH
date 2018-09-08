@@ -3,7 +3,7 @@ import sys
 
 from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCSVIO
 from lib.analysis_keys import AnalysisKeys
-from lib.collate_data import CollateData
+from lib.fold_data import FoldData
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generates a file for analysis from the cleaned and coded shows "
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     matrix_keys = show_keys
 
     sys.setrecursionlimit(1500)
-    data = CollateData.collate(user, data, collate_key_fn, equal_keys, concat_keys, matrix_keys)
+    data = FoldData.fold(user, data, collate_key_fn, equal_keys, concat_keys, matrix_keys)
 
     # Export to CSV
     export_keys = ["UID"]
