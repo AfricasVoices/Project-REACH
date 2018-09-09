@@ -1,11 +1,12 @@
 import argparse
+import random
 import time
 
 import pytz
 from core_data_modules.cleaners import somali
 from core_data_modules.traced_data import Metadata
 from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCodaIO, \
-    TracedDataTheInterfaceIO
+    TracedDataTheInterfaceIO, TracedDataCSVIO
 from core_data_modules.util import IOUtils
 from dateutil.parser import isoparse
 
@@ -23,6 +24,9 @@ if __name__ == "__main__":
                         help="Path to a JSON file to write processed messages to")
     parser.add_argument("interface_output_dir", metavar="interface-output-dir",
                         help="Path to a directory to write The Interface files to")
+    parser.add_argument("icr_output_path", metavar="icr-output-path",
+                        help="Path to a CSV file to write 200 messages and run ids to, for the purposes of testing"
+                             "inter-coder reliability"),
     parser.add_argument("coda_output_path", metavar="coda-output-path",
                         help="Path to a Coda file to write processed messages to")
 
@@ -33,6 +37,7 @@ if __name__ == "__main__":
     flow_name = args.flow_name
     json_output_path = args.json_output_path
     interface_output_dir = args.interface_output_dir
+    icr_output_path = args.icr_output_path
     coda_output_path = args.coda_output_path
 
     # Load data from JSON file
@@ -68,6 +73,11 @@ if __name__ == "__main__":
             Metadata(user, Metadata.get_call_location(), time.time())
         )
 
+    # Take 200 items pseudo-randomly for ICR
+    random.seed(0)
+    random.shuffle(show_messages)
+    icr_messages = show_messages[:200]
+
     # Output to JSON
     IOUtils.ensure_dirs_exist_for_file(json_output_path)
     with open(json_output_path, "w") as f:
@@ -83,3 +93,10 @@ if __name__ == "__main__":
     with open(coda_output_path, "w") as f:
         TracedDataCodaIO.export_traced_data_iterable_to_coda(
             show_messages, "{} (Text) - {}".format(variable_name, flow_name), f)
+
+    # Write ICR data to a file
+    run_id_key = "{} (Run ID) - {}".format(variable_name, flow_name)
+    raw_text_key = "{} (Text) - {}".format(variable_name, flow_name)
+    IOUtils.ensure_dirs_exist_for_file(icr_output_path)
+    with open(icr_output_path, "w") as f:
+        TracedDataCSVIO.export_traced_data_iterable_to_csv(icr_messages, f, headers=[run_id_key, raw_text_key])

@@ -5,8 +5,8 @@ set -e
 IMAGE_NAME=esc4jmcna-messages
 
 # Check that the correct number of arguments were provided.
-if [ $# -ne 7 ]; then
-    echo "Usage: sh docker-run.sh <user> <json-input-path> <flow-name> <variable-name> <json-output-path> <interface-output-dir> <coda-output-path>"
+if [ $# -ne 8 ]; then
+    echo "Usage: sh docker-run.sh <user> <json-input-path> <flow-name> <variable-name> <json-output-path> <interface-output-dir> <icr-output-path> <coda-output-path>"
     exit
 fi
 
@@ -17,7 +17,8 @@ FLOW_NAME=$3
 VARIABLE_NAME=$4
 OUTPUT_JSON=$5
 OUTPUT_INTERFACE_DIR=$6
-OUTPUT_CODA=$7
+OUTPUT_ICR=$7
+OUTPUT_CODA=$8
 
 # Build an image for this pipeline stage.
 docker build -t "$IMAGE_NAME" .
@@ -43,6 +44,9 @@ docker cp "$container:/data/output.json" "$OUTPUT_JSON"
 
 mkdir -p "$OUTPUT_INTERFACE_DIR"
 docker cp "$container:/data/output-interface/." "$OUTPUT_INTERFACE_DIR"
+
+mkdir -p "$(dirname "$OUTPUT_ICR")"
+docker cp "$container:/data/output-icr.csv" "$OUTPUT_ICR"
 
 mkdir -p "$(dirname "$OUTPUT_CODA")"
 docker cp "$container:/data/output-coda.csv" "$OUTPUT_CODA"
