@@ -14,6 +14,8 @@ RP_SERVER=$3
 RP_TOKEN=$4
 DATA_ROOT=$5
 
+TEST_CONTACTS_PATH="$(pwd)/test_contacts.json"
+
 cd "$RP_DIR"
 
 mkdir -p "$DATA_ROOT/04 Raw Surveys"
@@ -27,6 +29,7 @@ for SURVEY in ${SURVEYS[@]}
 do
     echo "Exporting survey $SURVEY"
 
-    sh docker-run.sh "$RP_SERVER" "$RP_TOKEN" "$SURVEY" "$USER" latest-only \
+    sh docker-run.sh  --flow-name "$SURVEY" --test-contacts-path "$TEST_CONTACTS_PATH" \
+        "$RP_SERVER" "$RP_TOKEN" "$USER" latest-only \
         "$DATA_ROOT/00 UUIDs/phone_uuids.json" "$DATA_ROOT/04 Raw Surveys/$SURVEY.json"
 done
