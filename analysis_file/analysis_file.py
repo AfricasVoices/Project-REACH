@@ -65,15 +65,16 @@ if __name__ == "__main__":
 
     # TODO: Handle STOP codes
 
-    collate_key_fn = lambda td: td["avf_phone_id"]
+    group_by_fn = lambda td: td["avf_phone_id"]
     equal_keys = ["UID"]
     equal_keys.extend(demog_keys)
     equal_keys.extend(evaluation_keys)
     concat_keys = ["humanitarian_priorities_raw"]
     matrix_keys = show_keys
 
-    sys.setrecursionlimit(1500)
-    data = FoldData.fold(user, data, collate_key_fn, equal_keys, concat_keys, matrix_keys)
+    # TODO: Output data before folding.
+
+    data = FoldData.fold(user, data, group_by_fn, equal_keys, concat_keys, matrix_keys)
 
     # Export to CSV
     export_keys = ["UID"]
