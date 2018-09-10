@@ -98,6 +98,9 @@ class AnalysisKeys(object):
             "district": cls.get_code(td, "district_review", "district_coded"),
             "district_raw": td.get("district_review", Codes.TRUE_MISSING),
 
+            "urban_rural": cls.get_code(td, "urban_rural_review", "urban_rural_coded"),
+            "urban_rural_raw": td.get("urban_rural_review", Codes.TRUE_MISSING),
+
             "age": cls.get_code(td, "age_review", "age_coded"),
             "age_raw": td.get("age_review", Codes.TRUE_MISSING),
 

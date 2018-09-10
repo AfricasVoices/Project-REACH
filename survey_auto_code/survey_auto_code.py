@@ -41,6 +41,8 @@ if __name__ == "__main__":
                      somali.DemographicCleaner.clean_gender),
         CleaningPlan("district_review", "district_clean", "District",
                      somali.DemographicCleaner.clean_somalia_district),
+        CleaningPlan("urban_rural_review", "urban_rural_clean", "Urban_Rural",
+                     somali.DemographicCleaner.clean_urban_rural),
         CleaningPlan("age_review", "age_clean", "Age",
                      somali.DemographicCleaner.clean_age),
         CleaningPlan("assessment_review", "assessment_clean", "Assessment",

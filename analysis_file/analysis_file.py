@@ -31,6 +31,8 @@ if __name__ == "__main__":
         "district_raw",
         "gender",
         "gender_raw",
+        "urban_rural",
+        "urban_rural_raw",
         "age",
         "age_raw",
         "assessment",
