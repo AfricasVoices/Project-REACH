@@ -17,4 +17,4 @@ mkdir -p "$DATA_ROOT/06 Auto-Coded"
 mkdir -p "$DATA_ROOT/07 Coda Files"
 
 sh docker-run.sh "$USER" "$DATA_ROOT/05 Messages & Raw Surveys/esc4jmcna_activation.json" \
-    "$DATA_ROOT/09 Coded Coda Files/" "$DATA_ROOT/06 Auto-Coded/esc4jmcna_activation.json" "$DATA_ROOT/07 Coda Files/"
+    "$DATA_ROOT/08 Coded Coda Files/" "$DATA_ROOT/06 Auto-Coded/esc4jmcna_activation.json" "$DATA_ROOT/07 Coda Files/"
