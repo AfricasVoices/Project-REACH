@@ -5,6 +5,7 @@ from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCSVIO
 
 from lib.analysis_keys import AnalysisKeys
 from lib.fold_data import FoldData
+from lib.consent import Consent
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generates a file for analysis from the cleaned and coded shows "
@@ -77,7 +78,7 @@ if __name__ == "__main__":
     export_keys.extend(demog_keys)
     export_keys.extend(evaluation_keys)
 
-
+    Consent.process_stopped(user, data, export_keys)
 
     # TODO: Output data before folding.
 
