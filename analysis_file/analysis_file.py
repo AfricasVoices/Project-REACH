@@ -2,6 +2,7 @@ import argparse
 import sys
 
 from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCSVIO
+
 from lib.analysis_keys import AnalysisKeys
 from lib.fold_data import FoldData
 
@@ -63,8 +64,6 @@ if __name__ == "__main__":
     show_keys = list(show_keys)
     show_keys.sort()
 
-    # TODO: Handle STOP codes
-
     group_by_fn = lambda td: td["avf_phone_id"]
     equal_keys = ["UID"]
     equal_keys.extend(demog_keys)
@@ -72,17 +71,20 @@ if __name__ == "__main__":
     concat_keys = ["humanitarian_priorities_raw"]
     matrix_keys = show_keys
 
-    # TODO: Output data before folding.
-
-    data = FoldData.fold(user, data, group_by_fn, equal_keys, concat_keys, matrix_keys)
-
-    # Export to CSV
     export_keys = ["UID"]
     export_keys.extend(show_keys)
     export_keys.append("humanitarian_priorities_raw")
     export_keys.extend(demog_keys)
     export_keys.extend(evaluation_keys)
 
+
+
+    # TODO: Output data before folding.
+
+    sys.setrecursionlimit(1500)
+    data = FoldData.fold(user, data, group_by_fn, equal_keys, concat_keys, matrix_keys)
+
+    # Export to CSV
     with open(csv_output_path, "w") as f:
         TracedDataCSVIO.export_traced_data_iterable_to_csv(data, f, headers=export_keys)
 
