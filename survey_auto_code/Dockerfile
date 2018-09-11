@@ -21,4 +21,4 @@ RUN mkdir /data
 # USER is an environment variable which need to be set when constructing this container e.g. via
 # docker run or docker container create. Use docker-run.sh to set these automatically.
 CMD pipenv run python survey_auto_code.py "$USER" \
-    /data/input.json /data/prev-coded /data/output.json /data/coded
+    /data/input.json /data/prev-coded /data/phone-uuid-table.json  /data/output.json /data/coded

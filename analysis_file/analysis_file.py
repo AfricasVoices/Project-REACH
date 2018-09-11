@@ -7,7 +7,7 @@ from lib.analysis_keys import AnalysisKeys
 from lib.fold_data import FoldData
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generates a file for analysis from the cleaned and coded shows "
+    parser = argparse.ArgumentParser(description="Generates a file for analysis from the cleaned and coded show "
                                                  "and survey responses")
     parser.add_argument("user", help="User launching this program")
     parser.add_argument("messages_input_dir", metavar="messages-input-dir",
@@ -18,14 +18,14 @@ if __name__ == "__main__":
     parser.add_argument("json_output_path", metavar="json-output-path",
                         help="Path to a JSON file to write serialized TracedData items to after modification by this"
                              "pipeline stage")
-    parser.add_argument("csv_output_path", metavar="csv-output-path",
-                        help="Path to a CSV file to write the summarised stats to")
+    parser.add_argument("respondent_csv_output_path", metavar="respondent-csv-output-path",
+                        help="")
 
     args = parser.parse_args()
     user = args.user
     data_input_path = args.survey_input_path
     json_output_path = args.json_output_path
-    csv_output_path = args.csv_output_path
+    respondent_csv_output_path = args.respondent_csv_output_path
 
     demog_keys = [
         "district",
@@ -65,19 +65,17 @@ if __name__ == "__main__":
     show_keys.sort()
 
     group_by_fn = lambda td: td["avf_phone_id"]
-    equal_keys = ["UID"]
+    equal_keys = ["UID", "operator"]
     equal_keys.extend(demog_keys)
     equal_keys.extend(evaluation_keys)
     concat_keys = ["humanitarian_priorities_raw"]
     matrix_keys = show_keys
 
-    export_keys = ["UID"]
+    export_keys = ["UID", "operator"]
     export_keys.extend(show_keys)
     export_keys.append("humanitarian_priorities_raw")
     export_keys.extend(demog_keys)
     export_keys.extend(evaluation_keys)
-
-
 
     # TODO: Output data before folding.
 
@@ -85,7 +83,7 @@ if __name__ == "__main__":
     data = FoldData.fold(user, data, group_by_fn, equal_keys, concat_keys, matrix_keys)
 
     # Export to CSV
-    with open(csv_output_path, "w") as f:
+    with open(respondent_csv_output_path, "w") as f:
         TracedDataCSVIO.export_traced_data_iterable_to_csv(data, f, headers=export_keys)
 
     # Export JSON
