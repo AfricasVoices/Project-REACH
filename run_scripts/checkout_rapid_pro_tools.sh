@@ -4,7 +4,7 @@ set -e
 
 if [ $# -ne 1 ]; then
     echo "Usage: sh checkout_rapid_pro_tools.sh <rapid-pro-tools-dir>"
-    echo "Ensures that a copy of the RapidProTools project exists in  'rapid-pro-tools-dir' by cloning/fetching as, "
+    echo "Ensures that a copy of the RapidProTools project exists in  'rapid-pro-tools-dir' by cloning/fetching as "
     echo "necessary, and checking-out the version needed by this project"
     exit
 fi

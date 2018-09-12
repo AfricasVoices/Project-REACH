@@ -15,7 +15,7 @@ cd ../messages
 
 mkdir -p "$DATA_ROOT/02 Clean Messages"
 mkdir -p "$DATA_ROOT/03 Interface Files"
-mkdir -p "$DATA_ROOT/06 Coda Files"
+mkdir -p "$DATA_ROOT/07 Coda Files"
 
 SHOWS=(
     "esc4jmcna_activation" S07E01_Humanitarian_Priorities
@@ -31,5 +31,5 @@ do
     sh docker-run.sh "$USER" "$DATA_ROOT/01 Raw Messages/$SHOW.json" \
         "$SHOW" "$VARIABLE" \
         "$DATA_ROOT/02 Clean Messages/$SHOW.json" "$DATA_ROOT/03 Interface Files/" \
-        "$DATA_ROOT/06 Coda Files/$SHOW.csv"
+        "$DATA_ROOT/07 Coda Files/$SHOW.csv"
 done

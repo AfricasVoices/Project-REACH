@@ -5,19 +5,18 @@ set -e
 IMAGE_NAME=esc4jmcna-survey-auto-code
 
 # Check that the correct number of arguments were provided.
-if [ $# -ne 6 ]; then
-    echo "Usage: sh docker-run.sh <user> <demog-input-path> <evaluation-input-path> <prev-coded-path> <json-output-path> <coded-output-path>"
+if [ $# -ne 5 ]; then
+    echo "Usage: sh docker-run.sh <user> <data-input-path> <prev-coded-path> <json-output-path> <coded-output-path>"
     echo "Note: The file at <prev-coded-output> need not exist for this script to run"
     exit
 fi
 
 # Assign the program arguments to bash variables.
 USER=$1
-INPUT_DEMOG=$2
-INPUT_PRACTICE=$3
-PREV_CODED_DIR=$4
-OUTPUT_JSON=$5
-CODED_DIR=$6
+INPUT_JSON=$2
+PREV_CODED_DIR=$3
+OUTPUT_JSON=$4
+CODED_DIR=$5
 
 # Build an image for this pipeline stage.
 docker build -t "$IMAGE_NAME" .
@@ -32,8 +31,7 @@ function finish {
 trap finish EXIT
 
 # Copy input data into the container
-docker cp "$INPUT_DEMOG" "$container:/data/input-demog.json"
-docker cp "$INPUT_PRACTICE" "$container:/data/input-evaluation.json"
+docker cp "$INPUT_JSON" "$container:/data/input.json"
 if [ -d "$PREV_CODED_DIR" ]; then
     docker cp "$PREV_CODED_DIR" "$container:/data/prev-coded"
 fi
