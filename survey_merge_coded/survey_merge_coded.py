@@ -2,7 +2,7 @@ import argparse
 import time
 from os import path
 
-from core_data_modules.cleaners import CharacterCleaner
+from core_data_modules.cleaners import CharacterCleaner, somali
 from core_data_modules.traced_data import Metadata
 from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCodaIO, TracedDataTheInterfaceIO
 from core_data_modules.util import IOUtils
@@ -64,6 +64,11 @@ if __name__ == "__main__":
         with open(coda_file_path, "r") as f:
             TracedDataCodaIO.import_coda_to_traced_data_iterable(
                 user, data, plan.raw_field, {plan.coda_name: plan.coded_field}, f, True)
+
+    # If ages are not in range 10-99, set to NOT_CODED
+    for td in data:
+        if td["age_coded"] is not None and somali.DemographicCleaner.clean_age_range(td["age_coded"]) is None:
+            td.append_data({"age_coded": "NC"}, Metadata(user, Metadata.get_call_location(), time.time()))
 
     # Merge manually coded activation Coda files into the cleaned dataset
     coda_file_path = path.join(coded_input_path, "esc4jmcna_activation_coded.csv")
