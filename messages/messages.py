@@ -47,7 +47,7 @@ if __name__ == "__main__":
     show_messages = [td for td in show_messages if show_message_key in td]
 
     # Filter out messages containing only noise
-    print("Messages classed as noise:")
+    print("Messages classified as noise:")
     not_noise = []
     for td in show_messages:
         if somali.DemographicCleaner.is_noise(td[show_message_key]):

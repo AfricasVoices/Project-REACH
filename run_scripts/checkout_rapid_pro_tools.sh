@@ -12,7 +12,7 @@ fi
 RAPID_PRO_TOOLS_DIR="$1"
 
 RAPID_PRO_TOOLS_REPO="https://github.com/AfricasVoices/RapidProTools.git"
-TAG="5e50286d380624589b686bfde456ded21ae13540"
+TAG="v0.2.1"
 
 mkdir -p "$RAPID_PRO_TOOLS_DIR"
 cd "$RAPID_PRO_TOOLS_DIR"
