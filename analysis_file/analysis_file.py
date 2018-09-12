@@ -7,7 +7,7 @@ from lib.analysis_keys import AnalysisKeys
 from lib.fold_data import FoldData
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generates a file for analysis from the cleaned and coded show "
+    parser = argparse.ArgumentParser(description="Generates files for analysis from the cleaned and coded show "
                                                  "and survey responses")
     parser.add_argument("user", help="User launching this program")
     parser.add_argument("messages_input_dir", metavar="messages-input-dir",
@@ -18,14 +18,18 @@ if __name__ == "__main__":
     parser.add_argument("json_output_path", metavar="json-output-path",
                         help="Path to a JSON file to write serialized TracedData items to after modification by this"
                              "pipeline stage")
-    parser.add_argument("respondent_csv_output_path", metavar="respondent-csv-output-path",
-                        help="")
+    parser.add_argument("csv_by_message_output_path", metavar="csv-by-message-output-path",
+                        help="Analysis dataset where messages are the unit for analysis (i.e. one message per row)")
+    parser.add_argument("csv_by_individual_output_path", metavar="csv-by-individual-output-path",
+                        help="Analysis dataset where respondents are the unit for analysis (i.e. one respondent "
+                             "per row, with all their messages joined into a single cell).")
 
     args = parser.parse_args()
     user = args.user
     data_input_path = args.survey_input_path
     json_output_path = args.json_output_path
-    respondent_csv_output_path = args.respondent_csv_output_path
+    csv_by_message_output_path = args.csv_by_message_output_path
+    csv_by_individual_output_path = args.csv_by_individual_output_path
 
     demog_keys = [
         "district",
@@ -79,11 +83,15 @@ if __name__ == "__main__":
 
     # TODO: Output data before folding.
 
-    sys.setrecursionlimit(1500)
-    data = FoldData.fold(user, data, group_by_fn, equal_keys, concat_keys, matrix_keys)
+    # Output to CSV with one message per row
+    with open(csv_by_message_output_path, "w") as f:
+        TracedDataCSVIO.export_traced_data_iterable_to_csv(data, f, headers=export_keys)
 
-    # Export to CSV
-    with open(respondent_csv_output_path, "w") as f:
+    sys.setrecursionlimit(1500)
+
+    # Export to CSV with one respondent per row
+    data = FoldData.fold(user, data, group_by_fn, equal_keys, concat_keys, matrix_keys)
+    with open(csv_by_individual_output_path, "w") as f:
         TracedDataCSVIO.export_traced_data_iterable_to_csv(data, f, headers=export_keys)
 
     # Export JSON
