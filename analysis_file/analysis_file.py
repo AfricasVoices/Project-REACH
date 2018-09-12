@@ -48,7 +48,7 @@ if __name__ == "__main__":
         "repeated_raw"
     ]
 
-    # Load data
+    # Load cleaned and coded message/survey data
     with open(data_input_path, "r") as f:
         data = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
 
@@ -74,6 +74,7 @@ if __name__ == "__main__":
 
     # TODO: Output data before folding.
 
+    # Fold data such that we get one TracedData item in data per individual.
     data = FoldData.fold(user, data, group_by_fn, equal_keys, concat_keys, matrix_keys)
 
     # Export to CSV
