@@ -31,6 +31,7 @@ if __name__ == "__main__":
     merge_plan = [
         MergePlan("gender_review", "gender_coded", "Gender"),
         MergePlan("district_review", "district_coded", "District"),
+        MergePlan("urban_rural_review", "urban_rural_coded", "Urban_Rural"),
         MergePlan("age_review", "age_coded", "Age"),
         MergePlan("assessment_review", "assessment_coded", "Assessment"),
         MergePlan("idp_review", "idp_coded", "IDP"),
