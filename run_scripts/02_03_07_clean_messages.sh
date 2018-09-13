@@ -3,7 +3,7 @@
 set -e
 
 if [ $# -ne 2 ]; then
-    echo "Usage: sh 02_03_06_clean_messages.sh <user> <data-root>"
+    echo "Usage: sh 02_03_07_clean_messages.sh <user> <data-root>"
     echo "Cleans radio show answers, and exports to The Interface and to Coda for analysis."
     exit
 fi
