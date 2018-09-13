@@ -21,8 +21,6 @@ if __name__ == "__main__":
                         help="Name of message variable in flow")
     parser.add_argument("json_output_path", metavar="json-output-path",
                         help="Path to a JSON file to write processed messages to")
-    parser.add_argument("interface_output_dir", metavar="interface-output-dir",
-                        help="Path to a directory to write The Interface files to")
     parser.add_argument("coda_output_path", metavar="coda-output-path",
                         help="Path to a Coda file to write processed messages to")
 
@@ -32,7 +30,6 @@ if __name__ == "__main__":
     variable_name = args.variable_name
     flow_name = args.flow_name
     json_output_path = args.json_output_path
-    interface_output_dir = args.interface_output_dir
     coda_output_path = args.coda_output_path
 
     # Load data from JSON file
@@ -72,11 +69,6 @@ if __name__ == "__main__":
     IOUtils.ensure_dirs_exist_for_file(json_output_path)
     with open(json_output_path, "w") as f:
         TracedDataJsonIO.export_traced_data_iterable_to_json(show_messages, f, pretty_print=True)
-
-    # Output to The Interface
-    IOUtils.ensure_dirs_exist(interface_output_dir)
-    TracedDataTheInterfaceIO.export_traced_data_iterable_to_the_interface(
-        show_messages, interface_output_dir, "avf_phone_id", show_message_key, eat_key)
 
     # Output messages to Coda
     IOUtils.ensure_dirs_exist_for_file(coda_output_path)

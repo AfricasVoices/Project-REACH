@@ -68,7 +68,7 @@ if __name__ == "__main__":
     show_keys = list(show_keys)
     show_keys.sort()
 
-    group_by_fn = lambda td: td["avf_phone_id"]
+    group_by_fn = lambda td: td["UID"]
     equal_keys = ["UID", "operator"]
     equal_keys.extend(demog_keys)
     equal_keys.extend(evaluation_keys)
@@ -88,6 +88,9 @@ if __name__ == "__main__":
 
     # Export to CSV with one respondent per row
     data = FoldData.fold(user, data, group_by_fn, equal_keys, concat_keys, matrix_keys)
+    
+    # Serializer is currently overflowing
+    # TODO: Investigate/address the cause of this.
     sys.setrecursionlimit(1500)
     with open(csv_by_individual_output_path, "w") as f:
         TracedDataCSVIO.export_traced_data_iterable_to_csv(data, f, headers=export_keys)
