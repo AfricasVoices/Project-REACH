@@ -72,7 +72,7 @@ if __name__ == "__main__":
         key_of_coded_prefix = "{}_coded_".format(key_of_raw)
         with open(coda_file_path, "r") as f:
             TracedDataCodaIO.import_coda_to_traced_data_iterable_as_matrix(
-                user, data, key_of_raw, {"Reason", "Reason 2"}, f, key_of_coded_prefix)
+                user, data, key_of_raw, {"Code 1", "Code 2", "Code 3", "Code 4", "Code 5"}, f, key_of_coded_prefix)
 
     # Write coded data back out to disk
     IOUtils.ensure_dirs_exist_for_file(json_output_path)
