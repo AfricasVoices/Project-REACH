@@ -75,11 +75,6 @@ if __name__ == "__main__":
     concat_keys = ["humanitarian_priorities_raw"]
     matrix_keys = show_keys
 
-    # TODO: Output data before folding.
-
-    # Fold data such that we get one TracedData item in data per individual.
-    data = FoldData.fold(user, data, group_by_fn, equal_keys, concat_keys, matrix_keys)
-
     # Export to CSV
     export_keys = ["UID", "operator"]
     export_keys.extend(show_keys)
@@ -87,16 +82,13 @@ if __name__ == "__main__":
     export_keys.extend(demog_keys)
     export_keys.extend(evaluation_keys)
 
-    # TODO: Output data before folding.
-
     # Output to CSV with one message per row
     with open(csv_by_message_output_path, "w") as f:
         TracedDataCSVIO.export_traced_data_iterable_to_csv(data, f, headers=export_keys)
 
-    sys.setrecursionlimit(1500)
-
     # Export to CSV with one respondent per row
     data = FoldData.fold(user, data, group_by_fn, equal_keys, concat_keys, matrix_keys)
+    # sys.setrecursionlimit(1500)
     with open(csv_by_individual_output_path, "w") as f:
         TracedDataCSVIO.export_traced_data_iterable_to_csv(data, f, headers=export_keys)
 
