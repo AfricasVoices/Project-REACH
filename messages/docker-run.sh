@@ -5,18 +5,19 @@ set -e
 IMAGE_NAME=esc4jmcna-messages
 
 # Check that the correct number of arguments were provided.
-if [ $# -ne 6 ]; then
-    echo "Usage: sh docker-run.sh <user> <json-input-path> <flow-name> <variable-name> <json-output-path> <coda-output-path>"
+if [ $# -ne 7 ]; then
+    echo "Usage: sh docker-run.sh <user> <json-input-path> <prev-coda-input-path> <flow-name> <variable-name> <json-output-path> <coda-output-path>"
     exit
 fi
 
 # Assign the program arguments to bash variables.
 USER=$1
 INPUT_JSON=$2
-FLOW_NAME=$3
-VARIABLE_NAME=$4
-OUTPUT_JSON=$5
-OUTPUT_CODA=$6
+INPUT_CODA=$3
+FLOW_NAME=$4
+VARIABLE_NAME=$5
+OUTPUT_JSON=$6
+OUTPUT_CODA=$7
 
 # Build an image for this pipeline stage.
 docker build -t "$IMAGE_NAME" .
@@ -32,6 +33,7 @@ trap finish EXIT
 
 # Copy input data into the container
 docker cp "$INPUT_JSON" "$container:/data/input.json"
+docker cp "$INPUT_CODA" "$container:/data/input-coda.csv"
 
 # Run the container
 docker start -a -i "$container"
