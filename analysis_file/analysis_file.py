@@ -8,7 +8,7 @@ from lib.fold_data import FoldData
 from lib.consent import Consent
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generates a file for analysis from the cleaned and coded shows "
+    parser = argparse.ArgumentParser(description="Generates files for analysis from the cleaned and coded show "
                                                  "and survey responses")
     parser.add_argument("user", help="User launching this program")
     parser.add_argument("messages_input_dir", metavar="messages-input-dir",
@@ -19,14 +19,18 @@ if __name__ == "__main__":
     parser.add_argument("json_output_path", metavar="json-output-path",
                         help="Path to a JSON file to write serialized TracedData items to after modification by this"
                              "pipeline stage")
-    parser.add_argument("csv_output_path", metavar="csv-output-path",
-                        help="Path to a CSV file to write the summarised stats to")
+    parser.add_argument("csv_by_message_output_path", metavar="csv-by-message-output-path",
+                        help="Analysis dataset where messages are the unit for analysis (i.e. one message per row)")
+    parser.add_argument("csv_by_individual_output_path", metavar="csv-by-individual-output-path",
+                        help="Analysis dataset where respondents are the unit for analysis (i.e. one respondent "
+                             "per row, with all their messages joined into a single cell).")
 
     args = parser.parse_args()
     user = args.user
     data_input_path = args.survey_input_path
     json_output_path = args.json_output_path
-    csv_output_path = args.csv_output_path
+    csv_by_message_output_path = args.csv_by_message_output_path
+    csv_by_individual_output_path = args.csv_by_individual_output_path
 
     demog_keys = [
         "district",
@@ -50,7 +54,7 @@ if __name__ == "__main__":
         "repeated_raw"
     ]
 
-    # Load data
+    # Load cleaned and coded message/survey data
     with open(data_input_path, "r") as f:
         data = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
 
@@ -65,28 +69,34 @@ if __name__ == "__main__":
     show_keys = list(show_keys)
     show_keys.sort()
 
-    group_by_fn = lambda td: td["avf_phone_id"]
-    equal_keys = ["UID"]
+    group_by_fn = lambda td: td["UID"]
+    equal_keys = ["UID", "operator"]
     equal_keys.extend(demog_keys)
     equal_keys.extend(evaluation_keys)
     concat_keys = ["humanitarian_priorities_raw"]
     matrix_keys = show_keys
 
-    export_keys = ["UID"]
+    # Export to CSV
+    export_keys = ["UID", "operator"]
     export_keys.extend(show_keys)
     export_keys.append("humanitarian_priorities_raw")
     export_keys.extend(demog_keys)
     export_keys.extend(evaluation_keys)
 
+    # Handle consent
     Consent.process_stopped(user, data, export_keys)
 
-    # TODO: Output data before folding.
+    # Output to CSV with one message per row
+    with open(csv_by_message_output_path, "w") as f:
+        TracedDataCSVIO.export_traced_data_iterable_to_csv(data, f, headers=export_keys)
 
-    sys.setrecursionlimit(1500)
+    # Export to CSV with one respondent per row
     data = FoldData.fold(user, data, group_by_fn, equal_keys, concat_keys, matrix_keys)
 
-    # Export to CSV
-    with open(csv_output_path, "w") as f:
+    # Serializer is currently overflowing
+    # TODO: Investigate/address the cause of this.
+    sys.setrecursionlimit(1500)
+    with open(csv_by_individual_output_path, "w") as f:
         TracedDataCSVIO.export_traced_data_iterable_to_csv(data, f, headers=export_keys)
 
     # Export JSON

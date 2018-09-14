@@ -1,6 +1,6 @@
 import time
 
-import pytz
+import pytz  # Timezone library for converting datetime objects between timezones
 from core_data_modules.cleaners import Codes
 from core_data_modules.traced_data import Metadata
 from dateutil.parser import isoparse
@@ -90,6 +90,7 @@ class AnalysisKeys(object):
     def set_analysis_keys(cls, user, td):
         td.append_data({
             "UID": td["avf_phone_id"],
+            "operator": td["operator"],
             "humanitarian_priorities_raw": td["S07E01_Humanitarian_Priorities (Text) - esc4jmcna_activation"],
 
             "gender": cls.get_code(td, "gender_review", "gender_coded"),
@@ -114,5 +115,5 @@ class AnalysisKeys(object):
             "involved_raw": td.get("involved_esc4jmcna", Codes.TRUE_MISSING),
 
             "repeated": cls.get_code(td, "repeated_esc4jmcna", "repeated_esc4jmcna_coded"),
-            "repeated_raw": td.get("repeated_esc4jmcna", Codes.TRUE_MISSING)
+            "repeated_raw": td.get("repeated_esc4jmcna", Codes.TRUE_MISSING),
         }, Metadata(user, Metadata.get_call_location(), time.time()))

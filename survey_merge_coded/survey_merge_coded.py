@@ -2,8 +2,9 @@ import argparse
 import time
 from os import path
 
+from core_data_modules.cleaners import CharacterCleaner
 from core_data_modules.traced_data import Metadata
-from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCodaIO
+from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCodaIO, TracedDataTheInterfaceIO
 from core_data_modules.util import IOUtils
 
 if __name__ == "__main__":
@@ -15,12 +16,15 @@ if __name__ == "__main__":
                         help="Directory to read manually-coded Coda files from")
     parser.add_argument("json_output_path", metavar="json-output-path",
                         help="Path to a JSON file to write merged results to")
+    parser.add_argument("interface_output_dir", metavar="interface-output-dir",
+                        help="Path to a directory to write The Interface files to")
 
     args = parser.parse_args()
     user = args.user
     json_input_path = args.json_input_path
     coded_input_path = args.coded_input_path
     json_output_path = args.json_output_path
+    interface_output_dir = args.interface_output_dir
 
     class MergePlan:
         def __init__(self, raw_field, coded_field, coda_name):
@@ -68,9 +72,22 @@ if __name__ == "__main__":
         key_of_coded_prefix = "{}_coded_".format(key_of_raw)
         with open(coda_file_path, "r") as f:
             TracedDataCodaIO.import_coda_to_traced_data_iterable_as_matrix(
-                user, data, key_of_raw, {"Reason", "Reason 2"}, f, key_of_coded_prefix)
+                user, data, key_of_raw, {"Code 1", "Code 2", "Code 3", "Code 4", "Code 5"}, f, key_of_coded_prefix)
 
     # Write coded data back out to disk
     IOUtils.ensure_dirs_exist_for_file(json_output_path)
     with open(json_output_path, "w") as f:
         TracedDataJsonIO.export_traced_data_iterable_to_json(data, f, pretty_print=True)
+
+    # Output to The Interface
+    for td in data:
+        td.append_data({
+            "district_review_interface": CharacterCleaner.clean_text(td["district_review"]),
+            "gender_review_interface": CharacterCleaner.clean_text(td["gender_review"])
+        }, Metadata(user, Metadata.get_call_location(), time.time()))
+
+    IOUtils.ensure_dirs_exist(interface_output_dir)
+    TracedDataTheInterfaceIO.export_traced_data_iterable_to_the_interface(
+        data, interface_output_dir, "avf_phone_id", "S07E01_Humanitarian_Priorities (Text) - esc4jmcna_activation",
+        "S07E01_Humanitarian_Priorities (Time EAT) - esc4jmcna_activation",
+        county_key="district_review_interface", gender_key="gender_review_interface")
