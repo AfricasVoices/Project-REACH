@@ -74,9 +74,17 @@ if __name__ == "__main__":
     equal_keys.extend(evaluation_keys)
     concat_keys = ["humanitarian_priorities_raw"]
     matrix_keys = show_keys
+    bool_keys = [
+        "bulk_sms",
+        "sms_ad",
+        "radio_promo",
+        "radio_show",
+        "non_logical_time"
+    ]
 
     # Export to CSV
     export_keys = ["UID", "operator"]
+    export_keys.extend(bool_keys)
     export_keys.extend(show_keys)
     export_keys.append("humanitarian_priorities_raw")
     export_keys.extend(demog_keys)

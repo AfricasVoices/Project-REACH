@@ -8,6 +8,8 @@ from core_data_modules.traced_data import Metadata, TracedData
 from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCodaIO
 from core_data_modules.util import IOUtils, PhoneNumberUuidTable
 
+from lib.channel import Channels
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Cleans the wt surveys and exports variables to Coda for "
                                                  "manual verification and coding")
@@ -95,6 +97,10 @@ if __name__ == "__main__":
             {"operator": operator if operator is not None else "NC"},  # TODO: Remove when Codes.NOT_CODED == "NC"
             Metadata(user, Metadata.get_call_location(), time.time())
         )
+
+    # Label each message with channel keys
+    for td in data:
+        Channels.set_channel_keys(user, td)
 
     # Write json output
     IOUtils.ensure_dirs_exist_for_file(json_output_path)
