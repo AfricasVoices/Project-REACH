@@ -32,6 +32,10 @@ if __name__ == "__main__":
     csv_by_message_output_path = args.csv_by_message_output_path
     csv_by_individual_output_path = args.csv_by_individual_output_path
 
+    # Serializer is currently overflowing
+    # TODO: Investigate/address the cause of this.
+    sys.setrecursionlimit(2500)
+
     demog_keys = [
         "district",
         "district_raw",
@@ -76,6 +80,8 @@ if __name__ == "__main__":
     concat_keys = ["humanitarian_priorities_raw"]
     matrix_keys = show_keys
     bool_keys = [
+        "withdrawn_consent",
+
         "bulk_sms",
         "sms_ad",
         "radio_promo",
@@ -91,22 +97,28 @@ if __name__ == "__main__":
     export_keys.extend(demog_keys)
     export_keys.extend(evaluation_keys)
 
-    # Handle consent
-    Consent.process_stopped(user, data, export_keys)
+    # Determine consent
+    Consent.determine_consent(user, data, export_keys)
+
+    # Export to CSV with one respondent per row
+    to_be_folded = []
+    for td in data:
+        to_be_folded.append(td.copy())
+    folded_data = FoldData.fold(user, to_be_folded, group_by_fn, equal_keys, concat_keys, matrix_keys, bool_keys)
+
+    # Process consent.
+    # TODO: This split between determine_consent and set_stopped is weird.
+    # TODO: Fix this by re-engineering FoldData to cope with consent directly?
+    Consent.set_stopped(user, data, export_keys)
+    Consent.set_stopped(user, folded_data, export_keys)
 
     # Output to CSV with one message per row
     with open(csv_by_message_output_path, "w") as f:
         TracedDataCSVIO.export_traced_data_iterable_to_csv(data, f, headers=export_keys)
 
-    # Export to CSV with one respondent per row
-    data = FoldData.fold(user, data, group_by_fn, equal_keys, concat_keys, matrix_keys)
-
-    # Serializer is currently overflowing
-    # TODO: Investigate/address the cause of this.
-    sys.setrecursionlimit(1500)
     with open(csv_by_individual_output_path, "w") as f:
-        TracedDataCSVIO.export_traced_data_iterable_to_csv(data, f, headers=export_keys)
+        TracedDataCSVIO.export_traced_data_iterable_to_csv(folded_data, f, headers=export_keys)
 
     # Export JSON
     with open(json_output_path, "w") as f:
-        TracedDataJsonIO.export_traced_data_iterable_to_json(data, f, pretty_print=True)
+        TracedDataJsonIO.export_traced_data_iterable_to_json(folded_data, f, pretty_print=True)

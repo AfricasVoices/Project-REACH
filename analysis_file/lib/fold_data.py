@@ -76,8 +76,8 @@ class FoldData(object):
             else:
                 bool_dict[key] = Codes.FALSE
 
-        td_1.append_data(bool_keys, Metadata(user, Metadata.get_call_location(), time.time()))
-        td_2.append_data(bool_keys, Metadata(user, Metadata.get_call_location(), time.time()))
+        td_1.append_data(bool_dict, Metadata(user, Metadata.get_call_location(), time.time()))
+        td_2.append_data(bool_dict, Metadata(user, Metadata.get_call_location(), time.time()))
 
     @staticmethod
     def set_other_keys_equal(user, td, other_keys):
@@ -96,6 +96,7 @@ class FoldData(object):
         equal_keys = set(equal_keys)
         equal_keys.update(concat_keys)
         equal_keys.update(matrix_keys)
+        equal_keys.update(bool_keys)
 
         cls.set_other_keys_equal(user, td_1, set(td_1.keys()) - set(equal_keys))
         cls.set_other_keys_equal(user, td_2, set(td_2.keys()) - set(equal_keys))

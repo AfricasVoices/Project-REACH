@@ -5,17 +5,25 @@ from core_data_modules.traced_data import Metadata
 
 
 class Consent(object):
-    Codes.STOP = "stop"
-
     @staticmethod
-    def process_stopped(user, data, keys):
-        print("Stopped:")
+    def td_has_stop_code(td, keys):
+        for key in keys:
+            if td.get(key) == Codes.STOP:
+                return True
+        return False
+
+    @classmethod
+    def determine_consent(cls, user, data, keys):
         for td in data:
-            stop_dict = dict()
-            for key in keys:
-                if td.get(key) == "stop":  # TODO: Use Codes.STOP
-                    print(td["avf_phone_id"])
+            td.append_data(
+                {"withdrawn_consent": Codes.TRUE if cls.td_has_stop_code(td, keys) else Codes.FALSE},
+                Metadata(user, Metadata.get_call_location(), time.time()))
+            
+    @staticmethod
+    def set_stopped(user, data, keys):
+        for td in data:
+            if td["withdrawn_consent"] == Codes.TRUE:
+                stop_dict = dict()
+                for key in keys:
                     stop_dict[key] = "stop"
-            td.append_data(stop_dict, Metadata(user, Metadata.get_call_location(), time.time()))
-
-
+                td.append_data(stop_dict, Metadata(user, Metadata.get_call_location(), time.time()))
