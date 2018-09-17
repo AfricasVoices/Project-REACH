@@ -1,5 +1,6 @@
 import time
 
+from core_data_modules.cleaners import Codes
 from core_data_modules.traced_data import Metadata
 
 
@@ -67,6 +68,18 @@ class FoldData(object):
         td_2.append_data(matrix_dict, Metadata(user, Metadata.get_call_location(), time.time()))
 
     @staticmethod
+    def fold_bool_keys(user, td_1, td_2, bool_keys):
+        bool_dict = dict()
+        for key in bool_keys:
+            if td_1.get(key) == Codes.TRUE or td_2.get(key) == Codes.TRUE:
+                bool_dict[key] = Codes.TRUE
+            else:
+                bool_dict[key] = Codes.FALSE
+
+        td_1.append_data(bool_dict, Metadata(user, Metadata.get_call_location(), time.time()))
+        td_2.append_data(bool_dict, Metadata(user, Metadata.get_call_location(), time.time()))
+
+    @staticmethod
     def set_other_keys_equal(user, td, other_keys):
         other_dict = dict()
         for key in other_keys:
@@ -74,14 +87,16 @@ class FoldData(object):
         td.append_data(other_dict, Metadata(user, Metadata.get_call_location(), time.time()))
 
     @classmethod
-    def fold_td(cls, user, td_1, td_2, equal_keys, concat_keys, matrix_keys, concat_delimiter=";"):
+    def fold_td(cls, user, td_1, td_2, equal_keys, concat_keys, matrix_keys, bool_keys, concat_delimiter=";"):
         cls.assert_equal_keys_equal(td_1, td_2, equal_keys)
         cls.fold_concat_keys(user, td_1, td_2, concat_keys, concat_delimiter)
         cls.fold_matrix_keys(user, td_1, td_2, matrix_keys)
+        cls.fold_bool_keys(user, td_1, td_2, bool_keys)
 
         equal_keys = set(equal_keys)
         equal_keys.update(concat_keys)
         equal_keys.update(matrix_keys)
+        equal_keys.update(bool_keys)
 
         cls.set_other_keys_equal(user, td_1, set(td_1.keys()) - set(equal_keys))
         cls.set_other_keys_equal(user, td_2, set(td_2.keys()) - set(equal_keys))
@@ -92,8 +107,9 @@ class FoldData(object):
         return folded_td
 
     @classmethod
-    def fold(cls, user, data, group_by_fn, equal_keys, concat_keys, matrix_keys, concat_delimiter=";"):
+    def fold(cls, user, data, group_by_fn, equal_keys, concat_keys, matrix_keys, bool_keys, concat_delimiter=";"):
         return cls.process_grouped(
             FoldData.group_by(data, group_by_fn),
-            lambda td_1, td_2: cls.fold_td(user, td_1, td_2, equal_keys, concat_keys, matrix_keys, concat_delimiter)
+            lambda td_1, td_2: cls.fold_td(
+                user, td_1, td_2, equal_keys, concat_keys, matrix_keys, bool_keys, concat_delimiter)
         )
