@@ -1,6 +1,7 @@
 import argparse
 import os
 import time
+import random
 
 import pytz
 from core_data_modules.cleaners import somali
@@ -50,15 +51,21 @@ if __name__ == "__main__":
     print("Messages classified as noise:")
     not_noise = []
     for td in show_messages:
-        if somali.DemographicCleaner.is_noise(td[show_message_key]):
-            print(td[show_message_key])
+        if somali.DemographicCleaner.is_noise(td[show_message_key], min_length=20):
+            print("Dropping: {}".format(td[show_message_key]))
         else:
             not_noise.append(td)
+    
+    print("{}:{} Dropped as noise/Total".format(len(show_messages) - len(not_noise), len(show_messages)))
     show_messages = not_noise
 
     # Convert date/time of messages to EAT
     utc_key = "{} (Time) - {}".format(variable_name, flow_name)
     eat_key = "{} (Time EAT) - {}".format(variable_name, flow_name)
+    inside_time_window = []
+    START_TIME = isoparse("2018-09-09T00+03:00")
+    END_TIME = isoparse("2018-09-17T00+03:00")
+
     for td in show_messages:
         utc_time = isoparse(td[utc_key])
         eat_time = utc_time.astimezone(pytz.timezone("Africa/Nairobi")).isoformat()
@@ -67,6 +74,14 @@ if __name__ == "__main__":
             {eat_key: eat_time},
             Metadata(user, Metadata.get_call_location(), time.time())
         )
+
+        if (utc_time >= START_TIME and utc_time <= END_TIME):
+            inside_time_window.append(td)
+        else:
+            print ("Dropping: {}".format(utc_time))
+
+    print("{}:{} Dropped as outside time/Total".format(len(show_messages) - len(inside_time_window), len(show_messages)))
+    show_messages = inside_time_window
 
     # Output to JSON
     IOUtils.ensure_dirs_exist_for_file(json_output_path)
