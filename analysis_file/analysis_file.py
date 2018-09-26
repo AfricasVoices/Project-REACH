@@ -38,6 +38,9 @@ if __name__ == "__main__":
 
     demog_keys = [
         "district",
+        "region",
+        "state",
+        "zone",
         "district_raw",
         "gender",
         "gender_raw",
