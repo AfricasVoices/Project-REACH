@@ -102,7 +102,7 @@ if __name__ == "__main__":
     export_keys.extend(demog_keys)
     export_keys.extend(evaluation_keys)
 
-    # Determine consent
+    # Set consent withdrawn based on presence of data coded as "stop"
     Consent.determine_consent(user, data, export_keys)
 
     # Set consent withdrawn based on auto-categorisation in Rapid Pro
