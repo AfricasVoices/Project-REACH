@@ -1,6 +1,9 @@
 import argparse
 import sys
+import time
 
+from core_data_modules.cleaners import Codes
+from core_data_modules.traced_data import Metadata
 from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCSVIO
 
 from lib.analysis_keys import AnalysisKeys
@@ -58,6 +61,8 @@ if __name__ == "__main__":
         "repeated_raw"
     ]
 
+    rapid_pro_consent_key = "esc4jmcna_consent_s07e01_complete"
+
     # Load cleaned and coded message/survey data
     with open(data_input_path, "r") as f:
         data = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
@@ -99,6 +104,11 @@ if __name__ == "__main__":
 
     # Determine consent
     Consent.determine_consent(user, data, export_keys)
+
+    # Set consent withdrawn based on auto-categorisation in Rapid Pro
+    for td in data:
+        if td.get(rapid_pro_consent_key) == "yes":  # Not using Codes.YES because this is from Rapid Pro
+            td.append_data({"withdrawn_consent": Codes.TRUE}, Metadata(user, Metadata.get_call_location(), time.time()))
 
     # Export to CSV with one respondent per row
     to_be_folded = []
