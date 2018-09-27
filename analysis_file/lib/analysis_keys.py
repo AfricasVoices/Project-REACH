@@ -1,7 +1,7 @@
 import time
 
 import pytz  # Timezone library for converting datetime objects between timezones
-from core_data_modules.cleaners import Codes
+from core_data_modules.cleaners import Codes, somali
 from core_data_modules.traced_data import Metadata
 from dateutil.parser import isoparse
 
@@ -84,6 +84,25 @@ class AnalysisKeys(object):
 
     @classmethod
     def set_analysis_keys(cls, user, td):
+        # Set district/region/state/zone codes from the coded district field.
+        # TODO: Move elsewhere
+        if not somali.DemographicCleaner.is_location(td["district_coded"]) and td["district_coded"] != "other" and \
+                td["district_coded"] != "NC" and td["district_coded"] is not None:
+            print("Unknown district: '{}'".format(td["district_coded"]))
+
+        def convert_nc(value):
+            if value == Codes.NOT_CODED:
+                return "NC"
+            return value
+
+        td.append_data({
+            "district_coded": convert_nc(somali.DemographicCleaner.get_district(td["district_coded"])),
+            "region_coded": convert_nc(somali.DemographicCleaner.get_region(td["district_coded"])),
+            "state_coded": convert_nc(somali.DemographicCleaner.get_state(td["district_coded"])),
+            "zone_coded": convert_nc(somali.DemographicCleaner.get_zone(td["district_coded"])),
+            "district_coded_no_hierarchy": td["district_coded"]
+        }, Metadata(user, Metadata.get_call_location(), time.time()))
+
         td.append_data({
             "UID": td["avf_phone_id"],
             "operator": td["operator"],
@@ -93,6 +112,11 @@ class AnalysisKeys(object):
             "gender_raw": td.get("gender_review", Codes.TRUE_MISSING),
 
             "district": cls.get_code(td, "district_review", "district_coded"),
+            # In the items below, use district_review as the raw field because this is the field these are all
+            # derived from.
+            "region": cls.get_code(td, "district_review", "region_coded"),
+            "state": cls.get_code(td, "district_review", "state_coded"),
+            "zone": cls.get_code(td, "district_review", "zone_coded"),
             "district_raw": td.get("district_review", Codes.TRUE_MISSING),
 
             "urban_rural": cls.get_code(td, "urban_rural_review", "urban_rural_coded"),
