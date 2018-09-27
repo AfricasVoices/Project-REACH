@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     # Serializer is currently overflowing
     # TODO: Investigate/address the cause of this.
-    sys.setrecursionlimit(5000)
+    sys.setrecursionlimit(10000)
 
     demog_keys = [
         "district",
