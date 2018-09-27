@@ -109,8 +109,9 @@ if __name__ == "__main__":
     # Process consent.
     # TODO: This split between determine_consent and set_stopped is weird.
     # TODO: Fix this by re-engineering FoldData to cope with consent directly?
-    Consent.set_stopped(user, data, export_keys)
-    Consent.set_stopped(user, folded_data, export_keys)
+    stop_keys = set(export_keys) - {"withdrawn_consent"}
+    Consent.set_stopped(user, data, stop_keys)
+    Consent.set_stopped(user, folded_data, stop_keys)
 
     # Output to CSV with one message per row
     with open(csv_by_message_output_path, "w") as f:
