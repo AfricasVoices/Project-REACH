@@ -61,7 +61,7 @@ if __name__ == "__main__":
         "repeated_raw"
     ]
 
-    rapid_pro_consent_key = "esc4jmcna_consent_s07e01_complete"
+    rapid_pro_consent_withdrawn_key = "esc4jmcna_consent_s07e01_complete"
 
     # Load cleaned and coded message/survey data
     with open(data_input_path, "r") as f:
@@ -107,7 +107,7 @@ if __name__ == "__main__":
 
     # Set consent withdrawn based on auto-categorisation in Rapid Pro
     for td in data:
-        if td.get(rapid_pro_consent_key) == "yes":  # Not using Codes.YES because this is from Rapid Pro
+        if td.get(rapid_pro_consent_withdrawn_key) == "yes":  # Not using Codes.YES because this is from Rapid Pro
             td.append_data({"withdrawn_consent": Codes.TRUE}, Metadata(user, Metadata.get_call_location(), time.time()))
 
     # Export to CSV with one respondent per row
@@ -119,8 +119,9 @@ if __name__ == "__main__":
     # Process consent.
     # TODO: This split between determine_consent and set_stopped is weird.
     # TODO: Fix this by re-engineering FoldData to cope with consent directly?
-    Consent.set_stopped(user, data, export_keys)
-    Consent.set_stopped(user, folded_data, export_keys)
+    stop_keys = set(export_keys) - {"withdrawn_consent"}
+    Consent.set_stopped(user, data, stop_keys)
+    Consent.set_stopped(user, folded_data, stop_keys)
 
     # Output to CSV with one message per row
     with open(csv_by_message_output_path, "w") as f:
