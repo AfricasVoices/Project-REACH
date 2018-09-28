@@ -47,25 +47,12 @@ if __name__ == "__main__":
     show_message_key = "{} (Text) - {}".format(variable_name, flow_name)
     show_messages = [td for td in show_messages if show_message_key in td]
 
-    # Filter out messages containing only noise
-    print("Messages classified as noise:")
-    not_noise = []
-    for td in show_messages:
-        if somali.DemographicCleaner.is_noise(td[show_message_key], min_length=20):
-            print("Dropping: {}".format(td[show_message_key]))
-        else:
-            not_noise.append(td)
-    
-    print("{}:{} Dropped as noise/Total".format(len(show_messages) - len(not_noise), len(show_messages)))
-    show_messages = not_noise
-
-    # Convert date/time of messages to EAT
+    # Convert date/time of messages to EAT and filter out messages sent outwith the project run period
     utc_key = "{} (Time) - {}".format(variable_name, flow_name)
     eat_key = "{} (Time EAT) - {}".format(variable_name, flow_name)
     inside_time_window = []
     START_TIME = isoparse("2018-09-09T00+03:00")
     END_TIME = isoparse("2018-09-17T00+03:00")
-
     for td in show_messages:
         utc_time = isoparse(td[utc_key])
         eat_time = utc_time.astimezone(pytz.timezone("Africa/Nairobi")).isoformat()
@@ -75,20 +62,27 @@ if __name__ == "__main__":
             Metadata(user, Metadata.get_call_location(), time.time())
         )
 
-        if (utc_time >= START_TIME and utc_time <= END_TIME):
+        if START_TIME <= utc_time <= END_TIME:
             inside_time_window.append(td)
         else:
-            print ("Dropping: {}".format(utc_time))
+            print("Dropping: {}".format(utc_time))
 
     print("{}:{} Dropped as outside time/Total".format(len(show_messages) - len(inside_time_window), len(show_messages)))
     show_messages = inside_time_window
 
-    # Output to JSON
-    IOUtils.ensure_dirs_exist_for_file(json_output_path)
-    with open(json_output_path, "w") as f:
-        TracedDataJsonIO.export_traced_data_iterable_to_json(show_messages, f, pretty_print=True)
+    # Filter out messages containing only noise
+    print("Messages classified as noise:")
+    not_noise = []
+    for td in show_messages:
+        if somali.DemographicCleaner.is_noise(td[show_message_key], min_length=20):
+            print("Dropping: {}".format(td[show_message_key]))
+            td.append_data({"noise": "true"}, Metadata(user, Metadata.get_call_location(), time.time()))
+        else:
+            not_noise.append(td)
+    
+    print("{}:{} Dropped as noise/Total".format(len(show_messages) - len(not_noise), len(show_messages)))
 
-    # Output messages to Coda
+    # Output messages which aren't noise to Coda
     IOUtils.ensure_dirs_exist_for_file(coda_output_path)
     if os.path.exists(prev_coda_path):
         # TODO: Modifying this line once the coding frame has been developed to include lots of Nones feels a bit
@@ -96,7 +90,12 @@ if __name__ == "__main__":
         scheme_keys = {"Relevance": None, "Code 1": None, "Code 2": None, "Code 3": None, "Code 4": None}
         with open(coda_output_path, "w") as f, open(prev_coda_path, "r") as prev_f:
             TracedDataCodaIO.export_traced_data_iterable_to_coda_with_scheme(
-                show_messages, show_message_key, scheme_keys, f, prev_f=prev_f)
+                not_noise, show_message_key, scheme_keys, f, prev_f=prev_f)
     else:
         with open(coda_output_path, "w") as f:
-            TracedDataCodaIO.export_traced_data_iterable_to_coda(show_messages, show_message_key, f)
+            TracedDataCodaIO.export_traced_data_iterable_to_coda(not_noise, show_message_key, f)
+
+    # Output to JSON
+    IOUtils.ensure_dirs_exist_for_file(json_output_path)
+    with open(json_output_path, "w") as f:
+        TracedDataJsonIO.export_traced_data_iterable_to_json(show_messages, f, pretty_print=True)

@@ -65,22 +65,18 @@ class AnalysisKeys(object):
     def set_matrix_keys(user, td, show_keys, coded_shows_prefix, radio_q_prefix):
         matrix_d = dict()
 
-        special = None
-        if td.get("{}_NC".format(coded_shows_prefix)) == "1":  # TODO: Change to use Codes.NOT_CODED
-            special = "0"
-        if td.get("{}_stop".format(coded_shows_prefix)) == "1":  # TODO: Change to use Codes.STOP?
-            special = "stop"
+        stopped = td.get("{}_{}".format(coded_shows_prefix, Codes.STOP)) == "1"
 
         for output_key in td:
             if output_key.startswith(coded_shows_prefix):
                 code_key = output_key.replace(coded_shows_prefix, radio_q_prefix)
 
-                if code_key.endswith("_NC") or code_key.endswith("_stop"):  # TODO: Change to use Codes
+                if code_key.endswith(Codes.STOP):
                     continue
 
                 show_keys.add(code_key)
-                if special is not None:
-                    matrix_d[code_key] = special
+                if stopped:
+                    matrix_d[code_key] = Codes.STOP
                 else:
                     matrix_d[code_key] = td[output_key]
 
