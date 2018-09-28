@@ -106,7 +106,7 @@ class AnalysisKeys(object):
         # If we failed to find a zone after searching location codes, try inferring from the operator code instead
         if td["zone_coded"] == "NC":
             td.append_data({
-                "zone_coded": somali.DemographicCleaner.get_zone_from_operator(td["operator"])
+                "zone_coded": convert_nc(somali.DemographicCleaner.get_zone_from_operator(td["operator"]))
             }, Metadata(user, Metadata.get_call_location(), time.time()))
 
         td.append_data({
@@ -122,7 +122,7 @@ class AnalysisKeys(object):
             # derived from.
             "region": cls.get_code(td, "district_review", "region_coded"),
             "state": cls.get_code(td, "district_review", "state_coded"),
-            "zone": cls.get_code(td, "district_review", "zone_coded"),
+            "zone": td.get("zone_coded"),
             "district_raw": td.get("district_review", Codes.TRUE_MISSING),
 
             "urban_rural": cls.get_code(td, "urban_rural_review", "urban_rural_coded"),
