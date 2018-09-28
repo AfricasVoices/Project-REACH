@@ -65,6 +65,11 @@ if __name__ == "__main__":
             TracedDataCodaIO.import_coda_to_traced_data_iterable(
                 user, data, plan.raw_field, {plan.coda_name: plan.coded_field}, f, True)
 
+    # Set districts coded as 'other' to 'NC'
+    for td in data:
+        if td["district_coded"] == "other":
+            td.append_data({"district_coded": "NC"}, Metadata(user, Metadata.get_call_location(), time.time()))
+
     # Merge manually coded activation Coda files into the cleaned dataset
     coda_file_path = path.join(coded_input_path, "esc4jmcna_activation_coded.csv")
     key_of_raw = "S07E01_Humanitarian_Priorities (Text) - esc4jmcna_activation"

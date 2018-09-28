@@ -86,7 +86,7 @@ class AnalysisKeys(object):
     def set_analysis_keys(cls, user, td):
         # Set district/region/state/zone codes from the coded district field.
         # TODO: Move elsewhere
-        if not somali.DemographicCleaner.is_location(td["district_coded"]) and td["district_coded"] != "other" and \
+        if not somali.DemographicCleaner.is_location(td["district_coded"]) and \
                 td["district_coded"] != "NC" and td["district_coded"] is not None:
             print("Unknown district: '{}'".format(td["district_coded"]))
 
