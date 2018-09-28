@@ -44,7 +44,7 @@ if __name__ == "__main__":
         "region",
         "state",
         "zone",
-        "district_coded_no_hierarchy",
+        "district_coda",
         "district_raw",
         "gender",
         "gender_raw",
