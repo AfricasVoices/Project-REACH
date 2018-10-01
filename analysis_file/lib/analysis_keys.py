@@ -84,31 +84,6 @@ class AnalysisKeys(object):
 
     @classmethod
     def set_analysis_keys(cls, user, td):
-        # Set district/region/state/zone codes from the coded district field.
-        # TODO: Move elsewhere
-        if not somali.DemographicCleaner.is_location(td["district_coded"]) and td["district_coded"] != Codes.STOP and \
-                td["district_coded"] != "NC" and td["district_coded"] is not None:
-            print("Unknown district: '{}'".format(td["district_coded"]))
-
-        def convert_nc(value):
-            if value == Codes.NOT_CODED:
-                return "NC"
-            return value
-
-        td.append_data({
-            "district_coded": convert_nc(somali.DemographicCleaner.get_district(td["district_coded"])),
-            "region_coded": convert_nc(somali.DemographicCleaner.get_region(td["district_coded"])),
-            "state_coded": convert_nc(somali.DemographicCleaner.get_state(td["district_coded"])),
-            "zone_coded": convert_nc(somali.DemographicCleaner.get_zone(td["district_coded"])),
-            "district_coda": cls.get_code(td, "district_review", "district_coded")
-        }, Metadata(user, Metadata.get_call_location(), time.time()))
-
-        # If we failed to find a zone after searching location codes, try inferring from the operator code instead
-        if td["zone_coded"] == "NC":
-            td.append_data({
-                "zone_coded": convert_nc(somali.DemographicCleaner.get_zone_from_operator(td["operator"]))
-            }, Metadata(user, Metadata.get_call_location(), time.time()))
-
         td.append_data({
             "UID": td["avf_phone_id"],
             "operator": td["operator"],
