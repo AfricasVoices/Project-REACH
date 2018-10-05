@@ -41,6 +41,10 @@ if __name__ == "__main__":
 
     demog_keys = [
         "district",
+        "region",
+        "state",
+        "zone",
+        "district_coda",
         "district_raw",
         "gender",
         "gender_raw",
@@ -104,6 +108,12 @@ if __name__ == "__main__":
 
     # Set consent withdrawn based on presence of data coded as "stop"
     Consent.determine_consent(user, data, export_keys)
+
+    # Set consent withdrawn based on stop codes from humanitarian priorities.
+    # TODO: Update Core Data to set 'stop's instead of '1's?
+    for td in data:
+        if td.get("humanitarian_priorities_stop") == "1":
+            td.append_data({"withdrawn_consent": Codes.TRUE}, Metadata(user, Metadata.get_call_location(), time.time()))
 
     # Set consent withdrawn based on auto-categorisation in Rapid Pro
     for td in data:

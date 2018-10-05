@@ -1,7 +1,7 @@
 import time
 
 import pytz  # Timezone library for converting datetime objects between timezones
-from core_data_modules.cleaners import Codes
+from core_data_modules.cleaners import Codes, somali
 from core_data_modules.traced_data import Metadata
 from dateutil.parser import isoparse
 
@@ -93,6 +93,11 @@ class AnalysisKeys(object):
             "gender_raw": td.get("gender_review", Codes.TRUE_MISSING),
 
             "district": cls.get_code(td, "district_review", "district_coded"),
+            # In the items below, use district_review as the raw field because this is the field these are all
+            # derived from.
+            "region": cls.get_code(td, "district_review", "region_coded"),
+            "state": cls.get_code(td, "district_review", "state_coded"),
+            "zone": td.get("zone_coded"),
             "district_raw": td.get("district_review", Codes.TRUE_MISSING),
 
             "urban_rural": cls.get_code(td, "urban_rural_review", "urban_rural_coded"),
