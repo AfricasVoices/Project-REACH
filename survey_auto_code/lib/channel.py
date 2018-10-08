@@ -12,7 +12,9 @@ class Channels(object):
     RADIO_SHOW_KEY = "radio_show"
     NON_LOGICAL_KEY = "non_logical_time"
 
-    BULK_SMS_RANGES = []  # TODO once the bulk SMS messages have been transmitted
+    BULK_SMS_RANGES = [
+        ("2018-09-14T21:25:00+03:00", "2018-09-14T23:59:00+03:00")
+    ]
     SMS_AD_RANGES = [
         ("2018-09-09T19:00:00+03:00", "2018-09-10T07:00:00+03:00")
     ]
