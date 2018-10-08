@@ -2,7 +2,8 @@ import argparse
 import time
 from os import path
 
-from core_data_modules.cleaners import CharacterCleaner, Codes, somali
+from core_data_modules.cleaners import CharacterCleaner, Codes
+from core_data_modules.cleaners.location_tools import SomaliaLocations
 from core_data_modules.traced_data import Metadata
 from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCodaIO, TracedDataTheInterfaceIO
 from core_data_modules.util import IOUtils
@@ -77,23 +78,23 @@ if __name__ == "__main__":
 
     # Set district/region/state/zone codes from the coded district field.
     for td in data:
-        if not somali.DemographicCleaner.is_location_code(td["district_coded"]) and \
+        if not SomaliaLocations.is_location_code(td["district_coded"]) and \
                 td["district_coded"] != Codes.STOP and \
                 td["district_coded"] != "NC" and td["district_coded"] is not None:
             print("Unknown district: '{}'".format(td["district_coded"]))
 
         td.append_data({
-            "district_coded": convert_nc(somali.DemographicCleaner.district_for_location_code(td["district_coded"])),
-            "region_coded": convert_nc(somali.DemographicCleaner.region_for_location_code(td["district_coded"])),
-            "state_coded": convert_nc(somali.DemographicCleaner.state_for_location_code(td["district_coded"])),
-            "zone_coded": convert_nc(somali.DemographicCleaner.zone_for_location_code(td["district_coded"])),
+            "district_coded": convert_nc(SomaliaLocations.district_for_location_code(td["district_coded"])),
+            "region_coded": convert_nc(SomaliaLocations.region_for_location_code(td["district_coded"])),
+            "state_coded": convert_nc(SomaliaLocations.state_for_location_code(td["district_coded"])),
+            "zone_coded": convert_nc(SomaliaLocations.zone_for_location_code(td["district_coded"])),
             "district_coda": Codes.TRUE_MISSING if td["district_review"] == Codes.TRUE_MISSING else td["district_coded"]
         }, Metadata(user, Metadata.get_call_location(), time.time()))
 
         # If we failed to find a zone after searching location codes, try inferring from the operator code instead
         if td["zone_coded"] == "NC":
             td.append_data({
-                "zone_coded": convert_nc(somali.DemographicCleaner.zone_for_operator_code(td["operator"]))
+                "zone_coded": convert_nc(SomaliaLocations.zone_for_operator_code(td["operator"]))
             }, Metadata(user, Metadata.get_call_location(), time.time()))
 
     # Merge manually coded activation Coda files into the cleaned dataset
