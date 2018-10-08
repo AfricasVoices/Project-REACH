@@ -113,7 +113,7 @@ if __name__ == "__main__":
     # Fix Not Reviewed to account for data which had relevant set only, to work around a Coda bug
     key_of_coded_nr = "{}{}".format(key_of_coded_prefix, Codes.NOT_REVIEWED)
     for td in data:
-        if td.get(key_of_coded_relevance) is not None:
+        if td.get(key_of_coded_relevance) is not None and td.get(key_of_coded_relevance) != Codes.NOT_REVIEWED:
             td.append_data({key_of_coded_nr: "0"}, Metadata(user, Metadata.get_call_location(), time.time()))
 
     # Assume everything that wasn't reviewed should have been assigned NOT_CODED, to work around a Coda bug
