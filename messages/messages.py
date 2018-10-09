@@ -6,7 +6,7 @@ import random
 import pytz
 from core_data_modules.cleaners import somali
 from core_data_modules.traced_data import Metadata
-from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCodaIO
+from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCodaIO, TracedDataCSVIO
 from core_data_modules.util import IOUtils
 from dateutil.parser import isoparse
 
@@ -26,6 +26,9 @@ if __name__ == "__main__":
                         help="Path to a JSON file to write processed messages to")
     parser.add_argument("coda_output_path", metavar="coda-output-path",
                         help="Path to a Coda file to write processed messages to")
+    parser.add_argument("icr_output_path", metavar="icr-output-path",
+                        help="Path to a CSV file to write 200 messages and run ids to, for use in inter-coder "
+                             "reliability evaluation")
 
     args = parser.parse_args()
     user = args.user
@@ -35,6 +38,9 @@ if __name__ == "__main__":
     flow_name = args.flow_name
     json_output_path = args.json_output_path
     coda_output_path = args.coda_output_path
+    icr_output_path = args.icr_output_path
+    
+    ICR_MESSAGES_COUNT = 200  # Number of messages to export in the ICR file
 
     # Load data from JSON file
     with open(json_input_path, "r") as f:
@@ -94,6 +100,18 @@ if __name__ == "__main__":
     else:
         with open(coda_output_path, "w") as f:
             TracedDataCodaIO.export_traced_data_iterable_to_coda(not_noise, show_message_key, f)
+
+    # Randomly select some messages to export for ICR
+    random.seed(0)
+    random.shuffle(not_noise)
+    icr_messages = not_noise[:ICR_MESSAGES_COUNT]
+
+    # Output ICR data to a CSV file
+    run_id_key = "{} (Run ID) - {}".format(variable_name, flow_name)
+    raw_text_key = "{} (Text) - {}".format(variable_name, flow_name)
+    IOUtils.ensure_dirs_exist_for_file(icr_output_path)
+    with open(icr_output_path, "w") as f:
+        TracedDataCSVIO.export_traced_data_iterable_to_csv(icr_messages, f, headers=[run_id_key, raw_text_key])
 
     # Output to JSON
     IOUtils.ensure_dirs_exist_for_file(json_output_path)

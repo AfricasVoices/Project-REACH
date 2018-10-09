@@ -30,5 +30,6 @@ do
 
     sh docker-run.sh "$USER" "$DATA_ROOT/01 Raw Messages/$SHOW.json" "$DATA_ROOT/08 Coded Coda Files/${SHOW}_coded.csv" \
         "$SHOW" "$VARIABLE" \
-        "$DATA_ROOT/02 Clean Messages/$SHOW.json" "$DATA_ROOT/07 Coda Files/$SHOW.csv"
+        "$DATA_ROOT/02 Clean Messages/$SHOW.json" "$DATA_ROOT/07 Coda Files/$SHOW.csv" \
+        "$DATA_ROOT/14 ICR CSVs/${SHOW}_icr.csv"
 done
