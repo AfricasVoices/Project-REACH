@@ -94,7 +94,7 @@ if __name__ == "__main__":
         operator = PhoneCleaner.clean_operator(phone_number)
 
         td.append_data(
-            {"operator": operator if operator is not None else "NC"},  # TODO: Remove when Codes.NOT_CODED == "NC"
+            {"operator": operator},
             Metadata(user, Metadata.get_call_location(), time.time())
         )
 

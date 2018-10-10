@@ -55,7 +55,7 @@ class FoldData(object):
         for key in matrix_keys:
             matrix_values = {"0", "1"}
 
-            if key.endswith("NC"):
+            if key.endswith(Codes.NOT_CODED):
                 matrix_dict[key] = "0" if td_1.get(key) == "0" or td_2.get(key) == "0" else "1"
                 continue
 
