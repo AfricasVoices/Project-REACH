@@ -5,10 +5,10 @@ import time
 from core_data_modules.cleaners import Codes
 from core_data_modules.traced_data import Metadata
 from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCSVIO
+from core_data_modules.util.consent_utils import ConsentUtils
 
 from lib.analysis_keys import AnalysisKeys
 from lib.fold_data import FoldData
-from lib.consent import Consent
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generates files for analysis from the cleaned and coded show "
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     export_keys.extend(evaluation_keys)
 
     # Set consent withdrawn based on presence of data coded as "stop"
-    Consent.determine_consent(user, data, export_keys)
+    ConsentUtils.determine_consent_withdrawn(user, data, export_keys, "withdrawn_consent")
 
     # Set consent withdrawn based on stop codes from humanitarian priorities.
     # TODO: Update Core Data to set 'stop's instead of '1's?
@@ -120,6 +120,10 @@ if __name__ == "__main__":
         if td.get(rapid_pro_consent_withdrawn_key) == "yes":  # Not using Codes.YES because this is from Rapid Pro
             td.append_data({"withdrawn_consent": Codes.TRUE}, Metadata(user, Metadata.get_call_location(), time.time()))
 
+    for td in data:
+        if "withdrawn_consent" not in td:
+            td.append_data({"withdrawn_consent": Codes.FALSE}, Metadata(user, Metadata.get_call_location(), time.time()))
+
     # Export to CSV with one respondent per row
     to_be_folded = []
     for td in data:
@@ -130,8 +134,8 @@ if __name__ == "__main__":
     # TODO: This split between determine_consent and set_stopped is weird.
     # TODO: Fix this by re-engineering FoldData to cope with consent directly?
     stop_keys = set(export_keys) - {"withdrawn_consent"}
-    Consent.set_stopped(user, data, stop_keys)
-    Consent.set_stopped(user, folded_data, stop_keys)
+    ConsentUtils.set_stopped(user, data, "withdrawn_consent")
+    ConsentUtils.set_stopped(user, folded_data, "withdrawn_consent")
 
     # Output to CSV with one message per row
     with open(csv_by_message_output_path, "w") as f:
