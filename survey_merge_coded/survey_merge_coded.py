@@ -74,7 +74,7 @@ if __name__ == "__main__":
     # Set district/region/state/zone codes from the coded district field.
     for td in data:
         if not SomaliaLocations.is_location_code(td["district_coded"]) and \
-                td["district_coded"] != Codes.STOP and \
+                td["district_coded"] != Codes.STOP and td["district_coded"] != Codes.TRUE_MISSING and \
                 td["district_coded"] != Codes.NOT_CODED and td["district_coded"] is not None:
             print("Unknown district: '{}'".format(td["district_coded"]))
 
@@ -109,7 +109,13 @@ if __name__ == "__main__":
     # Fix Not Reviewed to account for data which had relevant set only, to work around a Coda bug
     key_of_coded_nr = "{}{}".format(key_of_coded_prefix, Codes.NOT_REVIEWED)
     for td in data:
-        if td.get(key_of_coded_relevance) is not None and td.get(key_of_coded_relevance) != Codes.NOT_REVIEWED:
+        if td.get(key_of_coded_relevance) is not None and td.get(key_of_coded_relevance) != Codes.NOT_REVIEWED \
+                and td.get(key_of_coded_relevance) != Codes.TRUE_MISSING:
+            # Note: The third check (on Codes.TRUE_MISSING) here is incorrect behaviour - codes which are TRUE_MISSING
+            # should also be labelled as key_of_coded_nr: "0" because they don't need review.
+            # This check is needed to in order to continue producing analysis datasets identical to those used
+            # in the report for REACH.
+            # This error impacts 1 line in the messages analysis dataset (of about 26,000).
             td.append_data({key_of_coded_nr: "0"}, Metadata(user, Metadata.get_call_location(), time.time()))
 
     # Assume everything that wasn't reviewed should have been assigned NOT_CODED, to work around a Coda bug
