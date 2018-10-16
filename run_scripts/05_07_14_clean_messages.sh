@@ -15,7 +15,7 @@ cd ../messages
 
 mkdir -p "$DATA_ROOT/05 Clean Messages & Raw Surveys"
 mkdir -p "$DATA_ROOT/07 Coda Files"
-mkdir -p "$DATA_ROOT/14 XCR CSVs"
+mkdir -p "$DATA_ROOT/14 ICR CSVs"
 
 SHOWS=(
     "esc4jmcna_activation" S07E01_Humanitarian_Priorities
