@@ -89,32 +89,32 @@ class AnalysisKeys(object):
             "operator": td["operator"],
             "humanitarian_priorities_raw": td["S07E01_Humanitarian_Priorities (Text) - esc4jmcna_activation"],
 
-            "gender": cls.get_code(td, "gender_review", "gender_coded"),
-            "gender_raw": td.get("gender_review", Codes.TRUE_MISSING),
+            "gender": td["gender_coded"],
+            "gender_raw": td["gender_review"],
 
             "district": cls.get_code(td, "district_review", "district_coded"),
             # In the items below, use district_review as the raw field because this is the field these are all
             # derived from.
             "region": cls.get_code(td, "district_review", "region_coded"),
             "state": cls.get_code(td, "district_review", "state_coded"),
-            "zone": td.get("zone_coded"),
-            "district_raw": td.get("district_review", Codes.TRUE_MISSING),
+            "zone": td["zone_coded"],
+            "district_raw": td["district_review"],
 
-            "urban_rural": cls.get_code(td, "urban_rural_review", "urban_rural_coded"),
-            "urban_rural_raw": td.get("urban_rural_review", Codes.TRUE_MISSING),
+            "urban_rural": td["urban_rural_coded"],
+            "urban_rural_raw": td["urban_rural_review"],
 
-            "age": cls.get_code(td, "age_review", "age_coded"),
-            "age_raw": td.get("age_review", Codes.TRUE_MISSING),
+            "age": td["age_coded"],
+            "age_raw": td["age_review"],
 
-            "assessment": cls.get_code(td, "assessment_review", "assessment_coded"),
-            "assessment_raw": td.get("assessment_review", Codes.TRUE_MISSING),
+            "assessment": td["assessment_coded"],
+            "assessment_raw": td["assessment_review"],
 
-            "idp": cls.get_code(td, "idp_review", "idp_coded"),
-            "idp_raw": td.get("idp_review", Codes.TRUE_MISSING),
+            "idp": td["idp_coded"],
+            "idp_raw": td["idp_review"],
 
-            "involved": cls.get_code(td, "involved_esc4jmcna", "involved_esc4jmcna_coded"),
-            "involved_raw": td.get("involved_esc4jmcna", Codes.TRUE_MISSING),
+            "involved": td["involved_esc4jmcna_coded"],
+            "involved_raw": td["involved_esc4jmcna"],
 
-            "repeated": cls.get_code(td, "repeated_esc4jmcna", "repeated_esc4jmcna_coded"),
-            "repeated_raw": td.get("repeated_esc4jmcna", Codes.TRUE_MISSING),
+            "repeated": td["repeated_esc4jmcna_coded"],
+            "repeated_raw": td["repeated_esc4jmcna"],
         }, Metadata(user, Metadata.get_call_location(), time.time()))
