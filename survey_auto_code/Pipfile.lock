@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "29a7457e4ef5c81501d28124432393b91f2ba9209e6feae1d7ca98127f0d00e0"
+            "sha256": "3e4e769e2c58f981b715cc7277ac4379f17daf5d891bee28d0cd1d9bb81fcd3d"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -19,14 +19,13 @@
         "coredatamodules": {
             "editable": true,
             "git": "https://www.github.com/AfricasVoices/CoreDataModules",
-            "ref": "d29d3c3913238a4c225fb067c8a1ffcd25079864"
+            "ref": "5f0e72e4821c3e6ee7c7bb34fd596d06430d368c"
         },
         "deprecation": {
             "hashes": [
                 "sha256:68071e5ae7cd7e9da6c7dffd750922be4825c7c3a6780d29314076009cc39c35",
                 "sha256:fecd0f05024126466ba7e5309b905f09fce7d25d67e4648f7ec5488f9e764310"
             ],
-            "markers": "python_version >= '2.6' and python_version != '3.2.*' and python_version != '3.1.*' and python_version != '3.0.*'",
             "version": "==2.0.6"
         },
         "jsonpickle": {
@@ -49,7 +48,6 @@
                 "sha256:bc6c7146b91af3f567cf6daeaec360bc07d45ffec4cf5353f4d7a208ce7ca30a",
                 "sha256:d29593d8ebe7b57d6967b62494f8c72b03ac0262b1eed63826c6f788b3606401"
             ],
-            "markers": "python_version != '3.1.*' and python_version != '3.2.*' and python_version != '3.0.*' and python_version >= '2.6'",
             "version": "==2.2.2"
         },
         "python-dateutil": {
