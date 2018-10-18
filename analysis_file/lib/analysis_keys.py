@@ -10,28 +10,6 @@ class AnalysisKeys(object):
     # TODO: Move some of these methods to Core Data?
 
     @staticmethod
-    def get_code(td, key_of_raw, key_of_coded=None):
-        """
-        Returns the coded value for a response if one was provided, otherwise returns Codes.TRUE_MISSING
-
-        :param td: TracedData item to return the coded value of
-        :type td: TracedData
-        :param key_of_raw: Key in td of the raw response
-        :type key_of_raw: str
-        :param key_of_coded: Key in td of the coded response. Defaults to '<key_of_raw>_coded' if None
-        :type key_of_coded: str
-        :return: The coded value for a response if one was provided, otherwise Codes.TRUE_MISSING
-        :rtype: str
-        """
-        if key_of_coded is None:
-            key_of_coded = "{}_coded".format(key_of_raw)
-
-        if td[key_of_raw] == Codes.TRUE_MISSING:
-            return Codes.TRUE_MISSING
-        else:
-            return td[key_of_coded]
-
-    @staticmethod
     def get_date_time_utc(td):
         return isoparse(td["created_on"]).strftime("%Y-%m-%d %H:%M")
 
@@ -92,11 +70,9 @@ class AnalysisKeys(object):
             "gender": td["gender_coded"],
             "gender_raw": td["gender_review"],
 
-            "district": cls.get_code(td, "district_review", "district_coded"),
-            # In the items below, use district_review as the raw field because this is the field these are all
-            # derived from.
-            "region": cls.get_code(td, "district_review", "region_coded"),
-            "state": cls.get_code(td, "district_review", "state_coded"),
+            "district": td["district_coded"],
+            "region": td["region_coded"],
+            "state": td["state_coded"],
             "zone": td["zone_coded"],
             "district_raw": td["district_review"],
 

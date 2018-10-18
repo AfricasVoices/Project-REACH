@@ -3,6 +3,7 @@ import time
 from os import path
 
 from core_data_modules.cleaners import CharacterCleaner, Codes
+from core_data_modules.cleaners.codes import SomaliaCodes
 from core_data_modules.cleaners.location_tools import SomaliaLocations
 from core_data_modules.traced_data import Metadata
 from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCodaIO, TracedDataTheInterfaceIO
@@ -73,21 +74,26 @@ if __name__ == "__main__":
 
     # Set district/region/state/zone codes from the coded district field.
     for td in data:
-        if not SomaliaLocations.is_location_code(td["district_coded"]) and \
-                td["district_coded"] != Codes.STOP and td["district_coded"] != Codes.TRUE_MISSING and \
-                td["district_coded"] != Codes.NOT_CODED and td["district_coded"] is not None:
-            print("Unknown district: '{}'".format(td["district_coded"]))
-
-        td.append_data({
-            "district_coded": SomaliaLocations.district_for_location_code(td["district_coded"]),
-            "region_coded": SomaliaLocations.region_for_location_code(td["district_coded"]),
-            "state_coded": SomaliaLocations.state_for_location_code(td["district_coded"]),
-            "zone_coded": SomaliaLocations.zone_for_location_code(td["district_coded"]),
-            "district_coda": Codes.TRUE_MISSING if td["district_review"] == Codes.TRUE_MISSING else td["district_coded"]
-        }, Metadata(user, Metadata.get_call_location(), time.time()))
+        if td["district_review"] in {Codes.TRUE_MISSING, Codes.STOP}:
+            td.append_data({
+                "district_coded": td["district_review"],
+                "region_coded": td["district_review"],
+                "state_coded": td["district_review"],
+                "zone_coded": td["district_review"],
+                "district_coda": td["district_review"]
+            }, Metadata(user, Metadata.get_call_location(), time.time()))
+        else:
+            td.append_data({
+                "district_coded": SomaliaLocations.district_for_location_code(td["district_coded"]),
+                "region_coded": SomaliaLocations.region_for_location_code(td["district_coded"]),
+                "state_coded": SomaliaLocations.state_for_location_code(td["district_coded"]),
+                "zone_coded": SomaliaLocations.zone_for_location_code(td["district_coded"]),
+                "district_coda": Codes.TRUE_MISSING if td["district_review"] == Codes.TRUE_MISSING else td[
+                    "district_coded"]
+            }, Metadata(user, Metadata.get_call_location(), time.time()))
 
         # If we failed to find a zone after searching location codes, try inferring from the operator code instead
-        if td["zone_coded"] == Codes.NOT_CODED:
+        if td["zone_coded"] not in SomaliaCodes.ZONES:
             td.append_data({
                 "zone_coded": SomaliaLocations.zone_for_operator_code(td["operator"])
             }, Metadata(user, Metadata.get_call_location(), time.time()))
