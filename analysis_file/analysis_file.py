@@ -66,6 +66,7 @@ if __name__ == "__main__":
     ]
 
     rapid_pro_consent_withdrawn_key = "esc4jmcna_consent_s07e01_complete"
+    avf_consent_withdrawn_key = "withdrawn_consent"
 
     # Load cleaned and coded message/survey data
     with open(data_input_path, "r") as f:
@@ -89,7 +90,7 @@ if __name__ == "__main__":
     concat_keys = ["humanitarian_priorities_raw"]
     matrix_keys = show_keys
     bool_keys = [
-        "withdrawn_consent",
+        avf_consent_withdrawn_key,
 
         "bulk_sms",
         "sms_ad",
@@ -107,22 +108,22 @@ if __name__ == "__main__":
     export_keys.extend(evaluation_keys)
 
     # Set consent withdrawn based on presence of data coded as "stop"
-    ConsentUtils.determine_consent_withdrawn(user, data, export_keys, "withdrawn_consent")
+    ConsentUtils.determine_consent_withdrawn(user, data, export_keys, avf_consent_withdrawn_key)
 
     # Set consent withdrawn based on stop codes from humanitarian priorities.
     # TODO: Update Core Data to set 'stop's instead of '1's?
     for td in data:
         if td.get("humanitarian_priorities_stop") == "1":
-            td.append_data({"withdrawn_consent": Codes.TRUE}, Metadata(user, Metadata.get_call_location(), time.time()))
+            td.append_data({avf_consent_withdrawn_key: Codes.TRUE}, Metadata(user, Metadata.get_call_location(), time.time()))
 
     # Set consent withdrawn based on auto-categorisation in Rapid Pro
     for td in data:
         if td.get(rapid_pro_consent_withdrawn_key) == "yes":  # Not using Codes.YES because this is from Rapid Pro
-            td.append_data({"withdrawn_consent": Codes.TRUE}, Metadata(user, Metadata.get_call_location(), time.time()))
+            td.append_data({avf_consent_withdrawn_key: Codes.TRUE}, Metadata(user, Metadata.get_call_location(), time.time()))
 
     for td in data:
-        if "withdrawn_consent" not in td:
-            td.append_data({"withdrawn_consent": Codes.FALSE}, Metadata(user, Metadata.get_call_location(), time.time()))
+        if avf_consent_withdrawn_key not in td:
+            td.append_data({avf_consent_withdrawn_key: Codes.FALSE}, Metadata(user, Metadata.get_call_location(), time.time()))
 
     # Export to CSV with one respondent per row
     to_be_folded = []
@@ -131,9 +132,9 @@ if __name__ == "__main__":
     folded_data = FoldData.fold(user, to_be_folded, group_by_fn, equal_keys, concat_keys, matrix_keys, bool_keys)
 
     # Process consent
-    stop_keys = set(export_keys) - {"withdrawn_consent"}
-    ConsentUtils.set_stopped(user, data, "withdrawn_consent")
-    ConsentUtils.set_stopped(user, folded_data, "withdrawn_consent")
+    stop_keys = set(export_keys) - {avf_consent_withdrawn_key}
+    ConsentUtils.set_stopped(user, data, avf_consent_withdrawn_key)
+    ConsentUtils.set_stopped(user, folded_data, avf_consent_withdrawn_key)
 
     # Output to CSV with one message per row
     with open(csv_by_message_output_path, "w") as f:
