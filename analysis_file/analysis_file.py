@@ -130,9 +130,7 @@ if __name__ == "__main__":
         to_be_folded.append(td.copy())
     folded_data = FoldData.fold(user, to_be_folded, group_by_fn, equal_keys, concat_keys, matrix_keys, bool_keys)
 
-    # Process consent.
-    # TODO: This split between determine_consent and set_stopped is weird.
-    # TODO: Fix this by re-engineering FoldData to cope with consent directly?
+    # Process consent
     stop_keys = set(export_keys) - {"withdrawn_consent"}
     ConsentUtils.set_stopped(user, data, "withdrawn_consent")
     ConsentUtils.set_stopped(user, folded_data, "withdrawn_consent")
