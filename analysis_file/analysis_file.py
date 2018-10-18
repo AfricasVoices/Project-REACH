@@ -6,8 +6,10 @@ from core_data_modules.cleaners import Codes
 from core_data_modules.traced_data import Metadata
 from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCSVIO
 from core_data_modules.util.consent_utils import ConsentUtils
+from core_data_modules.traced_data.util import FoldTracedData
 
 from lib.analysis_keys import AnalysisKeys
+from lib.consent import Consent
 from lib.fold_data import FoldData
 
 if __name__ == "__main__":
@@ -83,7 +85,6 @@ if __name__ == "__main__":
     show_keys = list(show_keys)
     show_keys.sort()
 
-    group_by_fn = lambda td: td["UID"]
     equal_keys = ["UID", "operator"]
     equal_keys.extend(demog_keys)
     equal_keys.extend(evaluation_keys)
@@ -125,11 +126,15 @@ if __name__ == "__main__":
         if avf_consent_withdrawn_key not in td:
             td.append_data({avf_consent_withdrawn_key: Codes.FALSE}, Metadata(user, Metadata.get_call_location(), time.time()))
 
-    # Export to CSV with one respondent per row
+    # Fold data to have one respondent per row
     to_be_folded = []
     for td in data:
         to_be_folded.append(td.copy())
-    folded_data = FoldData.fold(user, to_be_folded, group_by_fn, equal_keys, concat_keys, matrix_keys, bool_keys)
+
+    folded_data = FoldTracedData.fold_iterable_of_traced_data(
+        user, data, fold_id_fn=lambda td: td["UID"],
+        equal_keys=equal_keys, concat_keys=concat_keys, matrix_keys=matrix_keys, bool_keys=bool_keys
+    )
 
     # Process consent
     stop_keys = set(export_keys) - {avf_consent_withdrawn_key}
