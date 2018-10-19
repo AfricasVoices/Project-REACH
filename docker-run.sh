@@ -2,7 +2,7 @@
 
 set -e
 
-IMAGE_NAME=esc4jmcna-update-messages-with-surveys
+IMAGE_NAME=reach-daap
 
 # Check that the correct number of arguments were provided.
 if [ $# -ne 4 ]; then
