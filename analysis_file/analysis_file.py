@@ -5,10 +5,12 @@ import time
 from core_data_modules.cleaners import Codes
 from core_data_modules.traced_data import Metadata
 from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCSVIO
+from core_data_modules.util.consent_utils import ConsentUtils
 from core_data_modules.traced_data.util import FoldTracedData
 
 from lib.analysis_keys import AnalysisKeys
 from lib.consent import Consent
+from lib.fold_data import FoldData
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generates files for analysis from the cleaned and coded show "
@@ -66,6 +68,7 @@ if __name__ == "__main__":
     ]
 
     rapid_pro_consent_withdrawn_key = "esc4jmcna_consent_s07e01_complete"
+    avf_consent_withdrawn_key = "withdrawn_consent"
 
     # Load cleaned and coded message/survey data
     with open(data_input_path, "r") as f:
@@ -88,7 +91,7 @@ if __name__ == "__main__":
     concat_keys = ["humanitarian_priorities_raw"]
     matrix_keys = show_keys
     bool_keys = [
-        "withdrawn_consent",
+        avf_consent_withdrawn_key,
 
         "bulk_sms",
         "sms_ad",
@@ -106,18 +109,22 @@ if __name__ == "__main__":
     export_keys.extend(evaluation_keys)
 
     # Set consent withdrawn based on presence of data coded as "stop"
-    Consent.determine_consent(user, data, export_keys)
+    ConsentUtils.determine_consent_withdrawn(user, data, export_keys, avf_consent_withdrawn_key)
 
     # Set consent withdrawn based on stop codes from humanitarian priorities.
     # TODO: Update Core Data to set 'stop's instead of '1's?
     for td in data:
         if td.get("humanitarian_priorities_stop") == "1":
-            td.append_data({"withdrawn_consent": Codes.TRUE}, Metadata(user, Metadata.get_call_location(), time.time()))
+            td.append_data({avf_consent_withdrawn_key: Codes.TRUE}, Metadata(user, Metadata.get_call_location(), time.time()))
 
     # Set consent withdrawn based on auto-categorisation in Rapid Pro
     for td in data:
         if td.get(rapid_pro_consent_withdrawn_key) == "yes":  # Not using Codes.YES because this is from Rapid Pro
-            td.append_data({"withdrawn_consent": Codes.TRUE}, Metadata(user, Metadata.get_call_location(), time.time()))
+            td.append_data({avf_consent_withdrawn_key: Codes.TRUE}, Metadata(user, Metadata.get_call_location(), time.time()))
+
+    for td in data:
+        if avf_consent_withdrawn_key not in td:
+            td.append_data({avf_consent_withdrawn_key: Codes.FALSE}, Metadata(user, Metadata.get_call_location(), time.time()))
 
     # Fold data to have one respondent per row
     to_be_folded = []
@@ -129,12 +136,10 @@ if __name__ == "__main__":
         equal_keys=equal_keys, concat_keys=concat_keys, matrix_keys=matrix_keys, bool_keys=bool_keys
     )
 
-    # Process consent.
-    # TODO: This split between determine_consent and set_stopped is weird.
-    # TODO: Fix this by re-engineering FoldData to cope with consent directly?
-    stop_keys = set(export_keys) - {"withdrawn_consent"}
-    Consent.set_stopped(user, data, stop_keys)
-    Consent.set_stopped(user, folded_data, stop_keys)
+    # Process consent
+    stop_keys = set(export_keys) - {avf_consent_withdrawn_key}
+    ConsentUtils.set_stopped(user, data, avf_consent_withdrawn_key)
+    ConsentUtils.set_stopped(user, folded_data, avf_consent_withdrawn_key)
 
     # Output to CSV with one message per row
     with open(csv_by_message_output_path, "w") as f:
