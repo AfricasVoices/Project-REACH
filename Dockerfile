@@ -21,6 +21,6 @@ ADD reach_pipeline.py /app
 
 # USER is an environment variable which needs to be set when constructing this container e.g. via
 # docker run or docker container create. Use docker-run.sh to set these automatically.
-CMD pipenv run python -u reach_pipeline.py "$USER" \
+CMD pipenv run python -u reach_pipeline.py "$USER" /data/phone-number-uuid-table-input.json \
     /data/messages-input.json /data/survey-input.json /data/prev-coded \
     /data/output.json /data/output-icr.csv /data/coded

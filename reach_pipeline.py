@@ -2,16 +2,20 @@ import argparse
 
 from core_data_modules.traced_data import TracedData
 from core_data_modules.traced_data.io import TracedDataJsonIO
-from core_data_modules.util import IOUtils
+from core_data_modules.util import IOUtils, PhoneNumberUuidTable
 
 from project_reach import CombineRawDatasets
 from project_reach.auto_code_show_messages import AutoCodeShowMessages
+from project_reach.auto_code_surveys import AutoCodeSurveys
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Runs the post-fetch phase of the REACH pipeline")
 
     parser.add_argument("user", help="User launching this program")
 
+    parser.add_argument("phone_number_uuid_table_path", metavar="phone-number-uuid-table-path",
+                        help="JSON file containing the phone number <-> UUID lookup table for the messages/surveys "
+                             "datasets")
     parser.add_argument("raw_messages_input_path", metavar="raw-messages-input-path",
                         help="Path to the input messages JSON file, containing a list of serialized TracedData objects")
     parser.add_argument("raw_surveys_input_path", metavar="raw-surveys-input-path",
@@ -30,6 +34,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     user = args.user
+    phone_number_uuid_table_path = args.phone_number_uuid_table_path
     raw_messages_input_path = args.raw_messages_input_path
     raw_surveys_input_path = args.raw_surveys_input_path
     prev_coded_dir_path = args.prev_coded_dir_path
@@ -47,6 +52,10 @@ if __name__ == "__main__":
     with open(raw_surveys_input_path, "r") as f:
         surveys = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
 
+    # Load phone number <-> UUID table
+    with open(phone_number_uuid_table_path, "r") as f:
+        phone_number_uuid_table = PhoneNumberUuidTable.load(f)
+
     # Add survey data to the messages
     print("Combine Datasets")
     CombineRawDatasets.combine_raw_datasets(user, messages, surveys)
@@ -56,6 +65,9 @@ if __name__ == "__main__":
     prev_coda_path = "{}/esc4jmcna_activation.csv".format(prev_coded_dir_path)
     coda_output_path = "{}/esc4jmcna_activation.csv".format(coded_dir_path)
     data = AutoCodeShowMessages.auto_code_show_messages(user, data, icr_output_path, coda_output_path, prev_coda_path)
+
+    print("Auto Code Surveys")
+    data = AutoCodeSurveys.auto_code_surveys(user, data, phone_number_uuid_table, coda_output_path, prev_coda_path)
 
     # Write json output
     print("Write Output")

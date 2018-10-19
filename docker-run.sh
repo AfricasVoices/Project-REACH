@@ -5,19 +5,20 @@ set -e
 IMAGE_NAME=reach-daap
 
 # Check that the correct number of arguments were provided.
-if [ $# -ne 7 ]; then
-    echo "Usage: sh docker-run.sh <user> <messages-input-path> <survey-input-path> <prev-coded-dir> <json-output-path> <icr-output-path> <coded-output-dir>"
+if [ $# -ne 8 ]; then
+    echo "Usage: sh docker-run.sh <user> <phone-number-uuid-table-path> <messages-input-path> <survey-input-path> <prev-coded-dir> <json-output-path> <icr-output-path> <coded-output-dir>"
     exit
 fi
 
 # Assign the program arguments to bash variables.
 USER=$1
-INPUT_MESSAGES=$2
-INPUT_SURVEYS=$3
-PREV_CODED_DIR=$4
-OUTPUT_JSON=$5
-OUTPUT_ICR=$6
-OUTPUT_CODED_DIR=$7
+INPUT_PHONE_UUID_TABLE=$2
+INPUT_MESSAGES=$3
+INPUT_SURVEYS=$4
+PREV_CODED_DIR=$5
+OUTPUT_JSON=$6
+OUTPUT_ICR=$7
+OUTPUT_CODED_DIR=$8
 
 # Build an image for this pipeline stage.
 docker build -t "$IMAGE_NAME" .
@@ -32,6 +33,7 @@ function finish {
 trap finish EXIT
 
 # Copy input data into the container
+docker cp "$INPUT_PHONE_UUID_TABLE" "$container:/data/phone-number-uuid-table-input.json"
 docker cp "$INPUT_MESSAGES" "$container:/data/messages-input.json"
 docker cp "$INPUT_SURVEYS" "$container:/data/survey-input.json"
 if [ -d "$PREV_CODED_DIR" ]; then
