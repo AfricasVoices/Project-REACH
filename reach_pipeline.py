@@ -43,7 +43,7 @@ if __name__ == "__main__":
     coded_dir_path = args.coded_dir_path
 
     # Load messages
-    print("Load messages")
+    print("Load Messages")
     with open(raw_messages_input_path, "r") as f:
         messages = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
 
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     data = AutoCodeShowMessages.auto_code_show_messages(user, data, icr_output_path, coda_output_path, prev_coda_path)
 
     print("Auto Code Surveys")
-    data = AutoCodeSurveys.auto_code_surveys(user, data, phone_number_uuid_table, coda_output_path, prev_coda_path)
+    data = AutoCodeSurveys.auto_code_surveys(user, data, phone_number_uuid_table, coded_dir_path, prev_coded_dir_path)
 
     # Write json output
     print("Write Output")
