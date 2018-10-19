@@ -9,8 +9,6 @@ from core_data_modules.util.consent_utils import ConsentUtils
 from core_data_modules.traced_data.util import FoldTracedData
 
 from lib.analysis_keys import AnalysisKeys
-from lib.consent import Consent
-from lib.fold_data import FoldData
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generates files for analysis from the cleaned and coded show "
