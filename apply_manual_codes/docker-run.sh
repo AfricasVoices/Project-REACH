@@ -2,7 +2,7 @@
 
 set -e
 
-IMAGE_NAME=esc4jmcna-survey-merge-coded
+IMAGE_NAME=esc4jmcna-apply-manual-codes
 
 # Check that the correct number of arguments were provided.
 if [ $# -ne 5 ]; then
