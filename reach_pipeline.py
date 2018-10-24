@@ -5,6 +5,7 @@ from core_data_modules.traced_data.io import TracedDataJsonIO
 from core_data_modules.util import IOUtils, PhoneNumberUuidTable
 
 from project_reach import CombineRawDatasets
+from project_reach.apply_manual_codes import ApplyManualCodes
 from project_reach.auto_code_show_messages import AutoCodeShowMessages
 from project_reach.auto_code_surveys import AutoCodeSurveys
 
@@ -26,6 +27,8 @@ if __name__ == "__main__":
 
     parser.add_argument("json_output_path", metavar="json-output-path",
                         help="Path to a JSON file to write TracedData for final analysis file to")
+    parser.add_argument("interface_output_dir", metavar="interface-output-dir",
+                        help="Path to a directory to write The Interface files to")
     parser.add_argument("icr_output_path", metavar="icr-output-path",
                         help="Path to a CSV file to write 200 messages and run ids to, for use in inter-coder "
                              "reliability evaluation")
@@ -34,11 +37,14 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     user = args.user
+
     phone_number_uuid_table_path = args.phone_number_uuid_table_path
     raw_messages_input_path = args.raw_messages_input_path
     raw_surveys_input_path = args.raw_surveys_input_path
     prev_coded_dir_path = args.prev_coded_dir_path
+
     json_output_path = args.json_output_path
+    interface_output_dir = args.interface_output_dir
     icr_output_path = args.icr_output_path
     coded_dir_path = args.coded_dir_path
 
@@ -68,6 +74,9 @@ if __name__ == "__main__":
 
     print("Auto Code Surveys")
     data = AutoCodeSurveys.auto_code_surveys(user, data, phone_number_uuid_table, coded_dir_path, prev_coded_dir_path)
+
+    print("Apply Manual Codes")
+    data = ApplyManualCodes.apply_manual_codes(user, data, prev_coded_dir_path, interface_output_dir)
 
     # Write json output
     print("Write Output")

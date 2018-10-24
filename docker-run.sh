@@ -5,8 +5,8 @@ set -e
 IMAGE_NAME=reach-daap
 
 # Check that the correct number of arguments were provided.
-if [ $# -ne 8 ]; then
-    echo "Usage: sh docker-run.sh <user> <phone-number-uuid-table-path> <messages-input-path> <survey-input-path> <prev-coded-dir> <json-output-path> <icr-output-path> <coded-output-dir>"
+if [ $# -ne 9 ]; then
+    echo "Usage: sh docker-run.sh <user> <phone-number-uuid-table-path> <messages-input-path> <survey-input-path> <prev-coded-dir> <json-output-path> <interface-output-dir> <icr-output-path> <coded-output-dir>"
     exit
 fi
 
@@ -17,8 +17,9 @@ INPUT_MESSAGES=$3
 INPUT_SURVEYS=$4
 PREV_CODED_DIR=$5
 OUTPUT_JSON=$6
-OUTPUT_ICR=$7
-OUTPUT_CODED_DIR=$8
+OUTPUT_INTERFACE=$7
+OUTPUT_ICR=$8
+OUTPUT_CODED_DIR=$9
 
 # Build an image for this pipeline stage.
 docker build -t "$IMAGE_NAME" .
@@ -46,6 +47,9 @@ docker start -a -i "$container"
 # Copy the output data back out of the container
 mkdir -p "$(dirname "$OUTPUT_JSON")"
 docker cp "$container:/data/output.json" "$OUTPUT_JSON"
+
+mkdir -p "$(dirname "$OUTPUT_INTERFACE")"
+docker cp "$container:/data/output-interface" "$OUTPUT_INTERFACE"
 
 mkdir -p "$(dirname "$OUTPUT_ICR")"
 docker cp "$container:/data/output-icr.csv" "$OUTPUT_ICR"

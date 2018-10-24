@@ -23,4 +23,4 @@ ADD reach_pipeline.py /app
 # docker run or docker container create. Use docker-run.sh to set these automatically.
 CMD pipenv run python -u reach_pipeline.py "$USER" /data/phone-number-uuid-table-input.json \
     /data/messages-input.json /data/survey-input.json /data/prev-coded \
-    /data/output.json /data/output-icr.csv /data/coded
+    /data/output.json /data/output-interface /data/output-icr.csv /data/coded
