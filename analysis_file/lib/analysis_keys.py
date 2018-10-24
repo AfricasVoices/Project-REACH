@@ -10,28 +10,6 @@ class AnalysisKeys(object):
     # TODO: Move some of these methods to Core Data?
 
     @staticmethod
-    def get_code(td, key_of_raw, key_of_coded=None):
-        """
-        Returns the coded value for a response if one was provided, otherwise returns Codes.TRUE_MISSING
-
-        :param td: TracedData item to return the coded value of
-        :type td: TracedData
-        :param key_of_raw: Key in td of the raw response
-        :type key_of_raw: str
-        :param key_of_coded: Key in td of the coded response. Defaults to '<key_of_raw>_coded' if None
-        :type key_of_coded: str
-        :return: The coded value for a response if one was provided, otherwise Codes.TRUE_MISSING
-        :rtype: str
-        """
-        if key_of_coded is None:
-            key_of_coded = "{}_coded".format(key_of_raw)
-
-        if td[key_of_raw] == Codes.TRUE_MISSING:
-            return Codes.TRUE_MISSING
-        else:
-            return td[key_of_coded]
-
-    @staticmethod
     def get_date_time_utc(td):
         return isoparse(td["created_on"]).strftime("%Y-%m-%d %H:%M")
 
@@ -89,32 +67,30 @@ class AnalysisKeys(object):
             "operator": td["operator"],
             "humanitarian_priorities_raw": td["S07E01_Humanitarian_Priorities (Text) - esc4jmcna_activation"],
 
-            "gender": cls.get_code(td, "gender_review", "gender_coded"),
-            "gender_raw": td.get("gender_review", Codes.TRUE_MISSING),
+            "gender": td["gender_coded"],
+            "gender_raw": td["gender_review"],
 
-            "district": cls.get_code(td, "district_review", "district_coded"),
-            # In the items below, use district_review as the raw field because this is the field these are all
-            # derived from.
-            "region": cls.get_code(td, "district_review", "region_coded"),
-            "state": cls.get_code(td, "district_review", "state_coded"),
-            "zone": td.get("zone_coded"),
-            "district_raw": td.get("district_review", Codes.TRUE_MISSING),
+            "district": td["district_coded"],
+            "region": td["region_coded"],
+            "state": td["state_coded"],
+            "zone": td["zone_coded"],
+            "district_raw": td["district_review"],
 
-            "urban_rural": cls.get_code(td, "urban_rural_review", "urban_rural_coded"),
-            "urban_rural_raw": td.get("urban_rural_review", Codes.TRUE_MISSING),
+            "urban_rural": td["urban_rural_coded"],
+            "urban_rural_raw": td["urban_rural_review"],
 
-            "age": cls.get_code(td, "age_review", "age_coded"),
-            "age_raw": td.get("age_review", Codes.TRUE_MISSING),
+            "age": td["age_coded"],
+            "age_raw": td["age_review"],
 
-            "assessment": cls.get_code(td, "assessment_review", "assessment_coded"),
-            "assessment_raw": td.get("assessment_review", Codes.TRUE_MISSING),
+            "assessment": td["assessment_coded"],
+            "assessment_raw": td["assessment_review"],
 
-            "idp": cls.get_code(td, "idp_review", "idp_coded"),
-            "idp_raw": td.get("idp_review", Codes.TRUE_MISSING),
+            "idp": td["idp_coded"],
+            "idp_raw": td["idp_review"],
 
-            "involved": cls.get_code(td, "involved_esc4jmcna", "involved_esc4jmcna_coded"),
-            "involved_raw": td.get("involved_esc4jmcna", Codes.TRUE_MISSING),
+            "involved": td["involved_esc4jmcna_coded"],
+            "involved_raw": td["involved_esc4jmcna"],
 
-            "repeated": cls.get_code(td, "repeated_esc4jmcna", "repeated_esc4jmcna_coded"),
-            "repeated_raw": td.get("repeated_esc4jmcna", Codes.TRUE_MISSING),
+            "repeated": td["repeated_esc4jmcna_coded"],
+            "repeated_raw": td["repeated_esc4jmcna"],
         }, Metadata(user, Metadata.get_call_location(), time.time()))
