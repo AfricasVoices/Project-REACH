@@ -72,8 +72,7 @@ if __name__ == "__main__":
 
     # Add survey data to the messages
     print("Combine Datasets")
-    CombineRawDatasets.combine_raw_datasets(user, messages, surveys)
-    data = messages
+    data = CombineRawDatasets.combine_raw_datasets(user, messages, surveys)
 
     print("Auto Code Messages")
     prev_coda_path = "{}/esc4jmcna_activation.csv".format(prev_coded_dir_path)
