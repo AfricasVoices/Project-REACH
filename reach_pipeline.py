@@ -5,6 +5,7 @@ from core_data_modules.traced_data.io import TracedDataJsonIO
 from core_data_modules.util import IOUtils, PhoneNumberUuidTable
 
 from project_reach import CombineRawDatasets
+from project_reach.analysis_file import AnalysisFile
 from project_reach.apply_manual_codes import ApplyManualCodes
 from project_reach.auto_code_show_messages import AutoCodeShowMessages
 from project_reach.auto_code_surveys import AutoCodeSurveys
@@ -34,6 +35,11 @@ if __name__ == "__main__":
                              "reliability evaluation")
     parser.add_argument("coded_dir_path", metavar="coded-dir-path",
                         help="Directory to write coded Coda files to")
+    parser.add_argument("csv_by_message_output_path", metavar="csv-by-message-output-path",
+                        help="Analysis dataset where messages are the unit for analysis (i.e. one message per row)")
+    parser.add_argument("csv_by_individual_output_path", metavar="csv-by-individual-output-path",
+                        help="Analysis dataset where respondents are the unit for analysis (i.e. one respondent "
+                             "per row, with all their messages joined into a single cell).")
 
     args = parser.parse_args()
     user = args.user
@@ -47,6 +53,8 @@ if __name__ == "__main__":
     interface_output_dir = args.interface_output_dir
     icr_output_path = args.icr_output_path
     coded_dir_path = args.coded_dir_path
+    csv_by_message_output_path = args.csv_by_message_output_path
+    csv_by_individual_output_path = args.csv_by_individual_output_path
 
     # Load messages
     print("Load Messages")
@@ -77,6 +85,9 @@ if __name__ == "__main__":
 
     print("Apply Manual Codes")
     data = ApplyManualCodes.apply_manual_codes(user, data, prev_coded_dir_path, interface_output_dir)
+
+    print("Generating Analysis CSVs")
+    data = AnalysisFile.generate(user, data, csv_by_message_output_path, csv_by_individual_output_path)
 
     # Write json output
     print("Write Output")
