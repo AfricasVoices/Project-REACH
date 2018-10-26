@@ -1,18 +1,25 @@
-import argparse
 import time
 from os import path
 
+import time
+from os import path
+
+import pytz
 from core_data_modules.cleaners import CharacterCleaner, Codes
 from core_data_modules.cleaners.codes import SomaliaCodes
 from core_data_modules.cleaners.location_tools import SomaliaLocations
 from core_data_modules.traced_data import Metadata
-from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCodaIO, TracedDataTheInterfaceIO
+from core_data_modules.traced_data.io import TracedDataCodaIO, TracedDataTheInterfaceIO
 from core_data_modules.util import IOUtils
+from dateutil.parser import isoparse
 
 
 class ApplyManualCodes(object):
     @staticmethod
     def apply_manual_codes(user, data, coded_input_path, interface_output_dir):
+        variable_name = "S07E01_Humanitarian_Priorities"
+        flow_name = "esc4jmcna_activation"
+
         class MergePlan:
             def __init__(self, raw_field, coded_field, coda_name):
                 self.raw_field = raw_field
@@ -118,10 +125,16 @@ class ApplyManualCodes(object):
                 td.append_data({key_of_coded_nc: "1"}, Metadata(user, Metadata.get_call_location(), time.time()))
 
         # Output to The Interface
+        utc_key = "{} (Time) - {}".format(variable_name, flow_name)
+        eat_key = "{} (Time EAT) - {}".format(variable_name, flow_name)
         for td in data:
+            # TODO: If we still need The Interface, update Core to do the timezone conversion in the exporter.
+            utc_time = isoparse(td[utc_key])
+            eat_time = utc_time.astimezone(pytz.timezone("Africa/Nairobi")).isoformat()
             td.append_data({
                 "district_review_interface": CharacterCleaner.clean_text(td["district_review"]),
-                "gender_review_interface": CharacterCleaner.clean_text(td["gender_review"])
+                "gender_review_interface": CharacterCleaner.clean_text(td["gender_review"]),
+                eat_key: eat_time
             }, Metadata(user, Metadata.get_call_location(), time.time()))
 
         IOUtils.ensure_dirs_exist(interface_output_dir)

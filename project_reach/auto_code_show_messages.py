@@ -1,12 +1,11 @@
-import argparse
 import os
-import time
+import os
 import random
+import time
 
-import pytz
 from core_data_modules.cleaners import somali
 from core_data_modules.traced_data import Metadata
-from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCodaIO, TracedDataCSVIO
+from core_data_modules.traced_data.io import TracedDataCodaIO, TracedDataCSVIO
 from core_data_modules.util import IOUtils
 from dateutil.parser import isoparse
 
@@ -28,18 +27,11 @@ class AutoCodeShowMessages(object):
 
         # Convert date/time of messages to EAT and filter out messages sent outwith the project run period
         utc_key = "{} (Time) - {}".format(variable_name, flow_name)
-        eat_key = "{} (Time EAT) - {}".format(variable_name, flow_name)
         inside_time_window = []
         START_TIME = isoparse("2018-09-09T00+03:00")
         END_TIME = isoparse("2018-09-17T00+03:00")
         for td in show_messages:
             utc_time = isoparse(td[utc_key])
-            eat_time = utc_time.astimezone(pytz.timezone("Africa/Nairobi")).isoformat()
-
-            td.append_data(
-                {eat_key: eat_time},
-                Metadata(user, Metadata.get_call_location(), time.time())
-            )
 
             if START_TIME <= utc_time <= END_TIME:
                 inside_time_window.append(td)
