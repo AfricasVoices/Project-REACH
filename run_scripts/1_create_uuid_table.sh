@@ -17,4 +17,4 @@ if [ -f "$DATA_DIR/UUIDs/phone_uuids.json" ]; then
 fi
 
 mkdir -p "$DATA_DIR/UUIDs"
-#echo "{}" >"$DATA_DIR/UUIDs/phone_uuids.json"
+echo "{}" >"$DATA_DIR/UUIDs/phone_uuids.json"
