@@ -18,9 +18,9 @@ class AutoCodeShowMessages(object):
     def auto_code_show_messages(user, data, icr_output_path, coda_output_path, prev_coda_path):
         variable_name = "S07E01_Humanitarian_Priorities"
         flow_name = "esc4jmcna_activation"
-
         project_start_date = isoparse("2018-09-09T00+03:00")
         project_end_date = isoparse("2018-09-17T00+03:00")
+        show_message_key = "{} (Text) - {}".format(variable_name, flow_name)
 
         ICR_MESSAGES_COUNT = 200
 
@@ -28,7 +28,6 @@ class AutoCodeShowMessages(object):
         data = MessageFilters.filter_test_messages(data)
 
         # Filter for runs which contain a response to this week's question.
-        show_message_key = "{} (Text) - {}".format(variable_name, flow_name)
         data = [td for td in data if show_message_key in td]
 
         # Convert date/time of messages to EAT and filter out messages sent outwith the project run period
