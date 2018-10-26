@@ -45,17 +45,9 @@ class AutoCodeShowMessages(object):
         data = MessageFilters.filter_time_range(
             data, time_key, isoparse("2018-09-09T00+03:00"), isoparse("2018-09-17T00+03:00"))
 
-        # Filter out messages containing only noise
-        print("Messages classified as noise:")
-        not_noise = []
-        for td in data:
-            if somali.DemographicCleaner.is_noise(td[show_message_key], min_length=20):
-                print("Dropping: {}".format(td[show_message_key]))
-                td.append_data({"noise": "true"}, Metadata(user, Metadata.get_call_location(), time.time()))
-            else:
-                not_noise.append(td)
-
-        print("{}:{} Dropped as noise/Total".format(len(data) - len(not_noise), len(data)))
+        # Identify messages which aren't noise, for export to Coda
+        not_noise = MessageFilters.filter_noise(
+            data, show_message_key, lambda msg: somali.DemographicCleaner.is_noise(msg, min_length=20))
 
         # Output messages which aren't noise to Coda
         IOUtils.ensure_dirs_exist_for_file(coda_output_path)
