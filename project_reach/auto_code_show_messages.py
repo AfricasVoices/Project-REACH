@@ -1,14 +1,16 @@
-import argparse
 import os
-import time
+import os
 import random
+import time
 
 import pytz
 from core_data_modules.cleaners import somali
 from core_data_modules.traced_data import Metadata
-from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCodaIO, TracedDataCSVIO
+from core_data_modules.traced_data.io import TracedDataCodaIO, TracedDataCSVIO
 from core_data_modules.util import IOUtils
 from dateutil.parser import isoparse
+
+from project_reach.lib.message_filters import MessageFilters
 
 
 class AutoCodeShowMessages(object):
@@ -20,7 +22,7 @@ class AutoCodeShowMessages(object):
         ICR_MESSAGES_COUNT = 200
 
         # Filter out test messages sent by AVF.
-        data = [td for td in data if not td.get("test_run", False)]
+        data = MessageFilters.filter_test_messages(data)
 
         # Filter for runs which contain a response to this week's question.
         show_message_key = "{} (Text) - {}".format(variable_name, flow_name)
