@@ -11,13 +11,13 @@ fi
 USER=$1
 DATA_ROOT=$2
 
-mkdir -p "$DATA_ROOT/08 Coded Coda Files"
+mkdir -p "$DATA_ROOT/Coded Coda Files"
 mkdir -p "$DATA_ROOT/Outputs"
 
 cd ..
 sh docker-run.sh alexander "$DATA_ROOT/UUIDs/phone_uuids.json" \
-    "$DATA_ROOT/01 Raw Messages/esc4jmcna_activation.json" \
-    "$DATA_ROOT/04 Raw Contacts/contacts.json" "$DATA_ROOT/08 Coded Coda Files/" \
+    "$DATA_ROOT/Raw Data/esc4jmcna_activation.json" \
+    "$DATA_ROOT/Raw Data/contacts.json" "$DATA_ROOT/Coded Coda Files/" \
     "$DATA_ROOT/Outputs/traced_data.json" "$DATA_ROOT/Outputs/Interface Files/" \
     "$DATA_ROOT/Outputs/esc4jmcna_activation_icr.csv" "$DATA_ROOT/Outputs/Coda Files/" \
     "$DATA_ROOT/Outputs/esc4jmcna_analysis_messages.csv" \

@@ -18,8 +18,7 @@ TEST_CONTACTS_PATH="$(pwd)/test_contacts.json"
 
 sh checkout_rapid_pro_tools.sh "$RP_DIR"
 
-mkdir -p "$DATA_ROOT/01 Raw Messages"
-mkdir -p "$DATA_ROOT/04 Raw Contacts"
+mkdir -p "$DATA_ROOT/Raw Data"
 
 SHOWS=(
     "esc4jmcna_activation"
@@ -33,12 +32,12 @@ do
 
     sh docker-run.sh --flow-name "$SHOW" --test-contacts-path "$TEST_CONTACTS_PATH" \
         "$RP_SERVER" "$RP_TOKEN" "$USER" all \
-        "$DATA_ROOT/UUIDs/phone_uuids.json" "$DATA_ROOT/01 Raw Messages/$SHOW.json"
+        "$DATA_ROOT/UUIDs/phone_uuids.json" "$DATA_ROOT/Raw Data/$SHOW.json"
 done
 
 # Export contacts
 cd "$RP_DIR/fetch_contacts"
 echo "Exporting contacts"
 sh docker-run.sh --test-contacts-path "$TEST_CONTACTS_PATH" "$RP_SERVER" "$RP_TOKEN" "$USER" \
-    "$DATA_ROOT/UUIDs/phone_uuids.json" "$DATA_ROOT/04 Raw Contacts/contacts.json"
+    "$DATA_ROOT/UUIDs/phone_uuids.json" "$DATA_ROOT/Raw Data/contacts.json"
 
