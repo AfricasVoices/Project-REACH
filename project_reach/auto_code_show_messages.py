@@ -19,6 +19,9 @@ class AutoCodeShowMessages(object):
         variable_name = "S07E01_Humanitarian_Priorities"
         flow_name = "esc4jmcna_activation"
 
+        project_start_date = isoparse("2018-09-09T00+03:00")
+        project_end_date = isoparse("2018-09-17T00+03:00")
+
         ICR_MESSAGES_COUNT = 200
 
         # Filter out test messages sent by AVF.
@@ -42,8 +45,7 @@ class AutoCodeShowMessages(object):
 
         # Filter out messages sent outwith the project run period
         time_key = "{} (Time) - {}".format(variable_name, flow_name)
-        data = MessageFilters.filter_time_range(
-            data, time_key, isoparse("2018-09-09T00+03:00"), isoparse("2018-09-17T00+03:00"))
+        data = MessageFilters.filter_time_range(data, time_key, project_start_date, project_end_date)
 
         # Identify messages which aren't noise, for export to Coda
         not_noise = MessageFilters.filter_noise(
