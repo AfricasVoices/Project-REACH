@@ -31,9 +31,6 @@ class AutoCodeShowMessages(object):
         # Convert date/time of messages to EAT and filter out messages sent outwith the project run period
         utc_key = "{} (Time) - {}".format(variable_name, flow_name)
         eat_key = "{} (Time EAT) - {}".format(variable_name, flow_name)
-        inside_time_window = []
-        START_TIME = isoparse("2018-09-09T00+03:00")
-        END_TIME = isoparse("2018-09-17T00+03:00")
         for td in data:
             utc_time = isoparse(td[utc_key])
             eat_time = utc_time.astimezone(pytz.timezone("Africa/Nairobi")).isoformat()
@@ -43,14 +40,10 @@ class AutoCodeShowMessages(object):
                 Metadata(user, Metadata.get_call_location(), time.time())
             )
 
-            if START_TIME <= utc_time <= END_TIME:
-                inside_time_window.append(td)
-            else:
-                print("Dropping: {}".format(utc_time))
-
-        print("{}:{} Dropped as outside time/Total".format(len(data) - len(inside_time_window),
-                                                           len(data)))
-        data = inside_time_window
+        # Filter out messages sent outwith the project run period
+        time_key = "{} (Time) - {}".format(variable_name, flow_name)
+        data = MessageFilters.filter_time_range(
+            data, time_key, isoparse("2018-09-09T00+03:00"), isoparse("2018-09-17T00+03:00"))
 
         # Filter out messages containing only noise
         print("Messages classified as noise:")
