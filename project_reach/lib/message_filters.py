@@ -1,7 +1,9 @@
 from dateutil.parser import isoparse
 
 
+# TODO: Move to Core
 class MessageFilters(object):
+    # TODO: Log which data is being dropped?
     @staticmethod
     def filter_test_messages(messages, test_run_key="test_run"):
         return [td for td in messages if not td.get(test_run_key, False)]
