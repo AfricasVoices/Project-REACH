@@ -16,9 +16,12 @@ RUN pipenv sync
 RUN mkdir /data
 
 # Copy the rest of the project
-ADD . /app
+ADD project_reach /app/project_reach
+ADD reach_pipeline.py /app
 
 # USER is an environment variable which needs to be set when constructing this container e.g. via
 # docker run or docker container create. Use docker-run.sh to set these automatically.
-CMD pipenv run python -u analysis_file.py "$USER" /data/messages-input /data/survey-input.json \
-    /data/output.json /data/output-messages.csv /data/output-individuals.csv
+CMD pipenv run python -u reach_pipeline.py "$USER" /data/phone-number-uuid-table-input.json \
+    /data/messages-input.json /data/survey-input.json /data/prev-coded \
+    /data/output.json /data/output-interface /data/output-icr.csv /data/coded \
+    /data/output-messages.csv /data/output-individuals.csv
