@@ -1,5 +1,4 @@
 import os
-import os
 import random
 import time
 
@@ -9,50 +8,40 @@ from core_data_modules.traced_data.io import TracedDataCodaIO, TracedDataCSVIO
 from core_data_modules.util import IOUtils
 from dateutil.parser import isoparse
 
+from project_reach.lib.message_filters import MessageFilters
+
 
 class AutoCodeShowMessages(object):
     @staticmethod
-    def auto_code_show_messages(user, show_messages, icr_output_path, coda_output_path, prev_coda_path):
+    def auto_code_show_messages(user, data, icr_output_path, coda_output_path, prev_coda_path):
         variable_name = "S07E01_Humanitarian_Priorities"
         flow_name = "esc4jmcna_activation"
+        project_start_date = isoparse("2018-09-09T00+03:00")
+        project_end_date = isoparse("2018-09-17T00+03:00")
+        show_message_key = "{} (Text) - {}".format(variable_name, flow_name)
 
         ICR_MESSAGES_COUNT = 200
 
         # Filter out test messages sent by AVF.
-        show_messages = [td for td in show_messages if not td.get("test_run", False)]
+        data = MessageFilters.filter_test_messages(data)
 
         # Filter for runs which contain a response to this week's question.
-        show_message_key = "{} (Text) - {}".format(variable_name, flow_name)
-        show_messages = [td for td in show_messages if show_message_key in td]
+        data = [td for td in data if show_message_key in td]
 
-        # Convert date/time of messages to EAT and filter out messages sent outwith the project run period
-        utc_key = "{} (Time) - {}".format(variable_name, flow_name)
-        inside_time_window = []
-        START_TIME = isoparse("2018-09-09T00+03:00")
-        END_TIME = isoparse("2018-09-17T00+03:00")
-        for td in show_messages:
-            utc_time = isoparse(td[utc_key])
+        time_key = "{} (Time) - {}".format(variable_name, flow_name)
+        data = MessageFilters.filter_time_range(data, time_key, project_start_date, project_end_date)
 
-            if START_TIME <= utc_time <= END_TIME:
-                inside_time_window.append(td)
-            else:
-                print("Dropping: {}".format(utc_time))
-
-        print("{}:{} Dropped as outside time/Total".format(len(show_messages) - len(inside_time_window),
-                                                           len(show_messages)))
-        show_messages = inside_time_window
-
-        # Filter out messages containing only noise
+        # Identify messages which aren't noise, for export to Coda
         print("Messages classified as noise:")
         not_noise = []
-        for td in show_messages:
+        for td in data:
             if somali.DemographicCleaner.is_noise(td[show_message_key], min_length=20):
                 print("Dropping: {}".format(td[show_message_key]))
                 td.append_data({"noise": "true"}, Metadata(user, Metadata.get_call_location(), time.time()))
             else:
                 not_noise.append(td)
 
-        print("{}:{} Dropped as noise/Total".format(len(show_messages) - len(not_noise), len(show_messages)))
+        print("{}:{} Dropped as noise/Total".format(len(data) - len(not_noise), len(data)))
 
         # Output messages which aren't noise to Coda
         IOUtils.ensure_dirs_exist_for_file(coda_output_path)
@@ -79,4 +68,4 @@ class AutoCodeShowMessages(object):
         with open(icr_output_path, "w") as f:
             TracedDataCSVIO.export_traced_data_iterable_to_csv(icr_messages, f, headers=[run_id_key, raw_text_key])
 
-        return show_messages
+        return data
