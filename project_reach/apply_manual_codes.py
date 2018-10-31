@@ -1,4 +1,3 @@
-import argparse
 import time
 from os import path
 
@@ -6,30 +5,16 @@ from core_data_modules.cleaners import CharacterCleaner, Codes
 from core_data_modules.cleaners.codes import SomaliaCodes
 from core_data_modules.cleaners.location_tools import SomaliaLocations
 from core_data_modules.traced_data import Metadata
-from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCodaIO, TracedDataTheInterfaceIO
+from core_data_modules.traced_data.io import TracedDataCodaIO, TracedDataTheInterfaceIO
 from core_data_modules.util import IOUtils
+
+from project_reach.lib.dataset_specification import DatasetSpecification
 
 
 class ApplyManualCodes(object):
     @staticmethod
     def apply_manual_codes(user, data, coded_input_path, interface_output_dir):
-        class MergePlan:
-            def __init__(self, raw_field, coded_field, coda_name):
-                self.raw_field = raw_field
-                self.coded_field = coded_field
-                self.coda_name = coda_name
-
-        merge_plan = [
-            MergePlan("gender_review", "gender_coded", "Gender"),
-            MergePlan("district_review", "district_coded", "District"),
-            MergePlan("urban_rural_review", "urban_rural_coded", "Urban_Rural"),
-            MergePlan("age_review", "age_coded", "Age"),
-            MergePlan("assessment_review", "assessment_coded", "Assessment"),
-            MergePlan("idp_review", "idp_coded", "IDP"),
-
-            MergePlan("involved_esc4jmcna", "involved_esc4jmcna_coded", "Involved"),
-            MergePlan("repeated_esc4jmcna", "repeated_esc4jmcna_coded", "Repeated")
-        ]
+        merge_plan = DatasetSpecification.columns
 
         # Merge manually coded survey/evaluation Coda files into the cleaned dataset
         for plan in merge_plan:
@@ -39,14 +24,14 @@ class ApplyManualCodes(object):
                 print("Warning: No Coda file found for key '{}'".format(plan.coda_name))
                 for td in data:
                     td.append_data(
-                        {plan.coded_field: None},  # TODO: Set to NR not to None
+                        {plan.manually_coded_field: None},  # TODO: Set to NR not to None
                         Metadata(user, Metadata.get_call_location(), time.time())
                     )
                 continue
 
             with open(coda_file_path, "r") as f:
                 TracedDataCodaIO.import_coda_to_traced_data_iterable(
-                    user, data, plan.raw_field, {plan.coda_name: plan.coded_field}, f, True)
+                    user, data, plan.source_field, {plan.coda_name: plan.manually_coded_field}, f, True)
 
         # Set districts coded as 'other' to 'NOT_CODED'
         for td in data:
