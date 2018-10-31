@@ -1,5 +1,4 @@
 import os
-import os
 import time
 from os import path
 
@@ -15,7 +14,7 @@ from project_reach.lib.dataset_specification import DatasetSpecification
 class AutoCodeSurveys(object):
     @staticmethod
     def auto_code_surveys(user, data, phone_uuid_table, coded_output_path, prev_coded_path):
-        cleaning_plan = DatasetSpecification.columns
+        cleaning_plan = DatasetSpecification.coding_plans
 
         # Mark missing entries in the raw data as true missing
         for td in data:

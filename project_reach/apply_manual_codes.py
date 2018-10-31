@@ -14,7 +14,7 @@ from project_reach.lib.dataset_specification import DatasetSpecification
 class ApplyManualCodes(object):
     @staticmethod
     def apply_manual_codes(user, data, coded_input_path, interface_output_dir):
-        merge_plan = DatasetSpecification.columns
+        merge_plan = DatasetSpecification.coding_plans
 
         # Merge manually coded survey/evaluation Coda files into the cleaned dataset
         for plan in merge_plan:
