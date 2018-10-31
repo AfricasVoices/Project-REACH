@@ -2,7 +2,6 @@ import os
 import random
 import time
 
-import pytz
 from core_data_modules.cleaners import somali
 from core_data_modules.traced_data import Metadata
 from core_data_modules.traced_data.io import TracedDataCodaIO, TracedDataCSVIO
@@ -29,19 +28,6 @@ class AutoCodeShowMessages(object):
         # Filter for runs which contain a response to this week's question.
         data = [td for td in data if show_message_key in td]
 
-        # Convert date/time of messages to EAT and filter out messages sent outwith the project run period
-        utc_key = "{} (Time) - {}".format(variable_name, flow_name)
-        eat_key = "{} (Time EAT) - {}".format(variable_name, flow_name)
-        for td in data:
-            utc_time = isoparse(td[utc_key])
-            eat_time = utc_time.astimezone(pytz.timezone("Africa/Nairobi")).isoformat()
-
-            td.append_data(
-                {eat_key: eat_time},
-                Metadata(user, Metadata.get_call_location(), time.time())
-            )
-
-        # Filter out messages sent outwith the project run period
         time_key = "{} (Time) - {}".format(variable_name, flow_name)
         data = MessageFilters.filter_time_range(data, time_key, project_start_date, project_end_date)
 
