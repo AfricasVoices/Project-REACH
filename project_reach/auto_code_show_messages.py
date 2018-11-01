@@ -1,5 +1,4 @@
 import os
-import random
 import time
 
 from core_data_modules.cleaners import somali
@@ -8,6 +7,7 @@ from core_data_modules.traced_data.io import TracedDataCodaIO, TracedDataCSVIO
 from core_data_modules.util import IOUtils
 from dateutil.parser import isoparse
 
+from project_reach.lib.icr import ICRTools
 from project_reach.lib.message_filters import MessageFilters
 
 
@@ -19,8 +19,7 @@ class AutoCodeShowMessages(object):
         project_start_date = isoparse("2018-09-09T00+03:00")
         project_end_date = isoparse("2018-09-17T00+03:00")
         show_message_key = "{} (Text) - {}".format(variable_name, flow_name)
-
-        ICR_MESSAGES_COUNT = 200
+        icr_messages_count = 200
 
         # Filter out test messages sent by AVF.
         data = MessageFilters.filter_test_messages(data)
@@ -57,9 +56,7 @@ class AutoCodeShowMessages(object):
                 TracedDataCodaIO.export_traced_data_iterable_to_coda(not_noise, show_message_key, f)
 
         # Randomly select some messages to export for ICR
-        random.seed(0)
-        random.shuffle(not_noise)
-        icr_messages = not_noise[:ICR_MESSAGES_COUNT]
+        icr_messages = ICRTools.generate_sample_for_icr(not_noise, icr_messages_count)
 
         # Output ICR data to a CSV file
         run_id_key = "{} (Run ID) - {}".format(variable_name, flow_name)
