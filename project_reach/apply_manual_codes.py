@@ -1,9 +1,6 @@
 import time
 from os import path
 
-import time
-from os import path
-
 import pytz
 from core_data_modules.cleaners import CharacterCleaner, Codes
 from core_data_modules.cleaners.codes import SomaliaCodes
