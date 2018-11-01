@@ -49,7 +49,39 @@ class AnalysisFile(object):
         # Translate keys to final values for analysis
         show_keys = set()
         for td in data:
-            AnalysisKeys.set_analysis_keys(user, td)
+            AnalysisKeys.set_analysis_keys(user, td, {
+                "UID": "avf_phone_id",
+                "operator": "operator",
+                "humanitarian_priorities_raw": "S07E01_Humanitarian_Priorities (Text) - esc4jmcna_activation",
+                
+                "gender": "gender_coded",
+                "gender_raw": "gender_review",
+
+                "district": "district_coded",
+                "region": "region_coded",
+                "state": "state_coded",
+                "zone": "zone_coded",
+                "district_raw": "district_review",
+
+                "urban_rural": "urban_rural_coded",
+                "urban_rural_raw": "urban_rural_review",
+
+                "age": "age_coded",
+                "age_raw": "age_review",
+
+                "assessment": "assessment_coded",
+                "assessment_raw": "assessment_review",
+
+                "idp": "idp_coded",
+                "idp_raw": "idp_review",
+
+                "involved": "involved_esc4jmcna_coded",
+                "involved_raw": "involved_esc4jmcna",
+
+                "repeated": "repeated_esc4jmcna_coded",
+                "repeated_raw": "repeated_esc4jmcna"
+            })
+            
             AnalysisKeys.set_matrix_keys(
                 user, td, show_keys, "S07E01_Humanitarian_Priorities (Text) - esc4jmcna_activation_coded",
                 "humanitarian_priorities"

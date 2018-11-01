@@ -1,7 +1,7 @@
 import time
 
 import pytz  # Timezone library for converting datetime objects between timezones
-from core_data_modules.cleaners import Codes, somali
+from core_data_modules.cleaners import Codes
 from core_data_modules.traced_data import Metadata
 from dateutil.parser import isoparse
 
@@ -60,37 +60,9 @@ class AnalysisKeys(object):
 
         td.append_data(matrix_d, Metadata(user, Metadata.get_call_location(), time.time()))
 
-    @classmethod
-    def set_analysis_keys(cls, user, td):
-        td.append_data({
-            "UID": td["avf_phone_id"],
-            "operator": td["operator"],
-            "humanitarian_priorities_raw": td["S07E01_Humanitarian_Priorities (Text) - esc4jmcna_activation"],
-
-            "gender": td["gender_coded"],
-            "gender_raw": td["gender_review"],
-
-            "district": td["district_coded"],
-            "region": td["region_coded"],
-            "state": td["state_coded"],
-            "zone": td["zone_coded"],
-            "district_raw": td["district_review"],
-
-            "urban_rural": td["urban_rural_coded"],
-            "urban_rural_raw": td["urban_rural_review"],
-
-            "age": td["age_coded"],
-            "age_raw": td["age_review"],
-
-            "assessment": td["assessment_coded"],
-            "assessment_raw": td["assessment_review"],
-
-            "idp": td["idp_coded"],
-            "idp_raw": td["idp_review"],
-
-            "involved": td["involved_esc4jmcna_coded"],
-            "involved_raw": td["involved_esc4jmcna"],
-
-            "repeated": td["repeated_esc4jmcna_coded"],
-            "repeated_raw": td["repeated_esc4jmcna"],
-        }, Metadata(user, Metadata.get_call_location(), time.time()))
+    @staticmethod
+    def set_analysis_keys(user, td, key_map):
+        td.append_data(
+            {new_key: td[old_key] for new_key, old_key in key_map.items()},
+            Metadata(user, Metadata.get_call_location(), time.time())
+        )
