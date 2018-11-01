@@ -1,9 +1,6 @@
 import time
 from os import path
 
-import time
-from os import path
-
 import pytz
 from core_data_modules.cleaners import CharacterCleaner, Codes
 from core_data_modules.cleaners.codes import SomaliaCodes
@@ -46,7 +43,7 @@ class ApplyManualCodes(object):
                 print("Warning: No Coda file found for key '{}'".format(plan.coda_name))
                 for td in data:
                     td.append_data(
-                        {plan.coded_field: None},  # TODO: Set to NR not to None
+                        {plan.coded_field: Codes.NOT_REVIEWED},
                         Metadata(user, Metadata.get_call_location(), time.time())
                     )
                 continue
