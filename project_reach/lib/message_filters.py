@@ -9,6 +9,11 @@ class MessageFilters(object):
         return [td for td in messages if not td.get(test_run_key, False)]
 
     @staticmethod
+    def filter_empty_messages(messages, message_key):
+        # TODO: Before using on future projects, consider whether messages which are "" should be considered as empty
+        return [td for td in messages if message_key in td]
+
+    @staticmethod
     def filter_time_range(messages, time_key, start_time, end_time):
         return [td for td in messages if start_time <= isoparse(td.get(time_key)) <= end_time]
 

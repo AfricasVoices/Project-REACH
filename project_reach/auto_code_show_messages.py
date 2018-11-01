@@ -26,7 +26,7 @@ class AutoCodeShowMessages(object):
         data = MessageFilters.filter_test_messages(data)
 
         # Filter for runs which contain a response to this week's question.
-        data = [td for td in data if show_message_key in td]
+        data = MessageFilters.filter_empty_messages(data, show_message_key)
 
         time_key = "{} (Time) - {}".format(variable_name, flow_name)
         data = MessageFilters.filter_time_range(data, time_key, project_start_date, project_end_date)
