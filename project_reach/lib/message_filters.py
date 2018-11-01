@@ -10,8 +10,8 @@ class MessageFilters(object):
 
     @staticmethod
     def filter_time_range(messages, time_key, start_time, end_time):
-        return [td for td in messages if start_time <= isoparse(td[time_key]) <= end_time]
+        return [td for td in messages if start_time <= isoparse(td.get(time_key)) <= end_time]
 
     @staticmethod
     def filter_noise(messages, message_key, noise_fn):
-        return [td for td in messages if not noise_fn(td[message_key])]
+        return [td for td in messages if not noise_fn(td.get(message_key))]
