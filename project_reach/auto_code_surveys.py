@@ -14,12 +14,10 @@ from project_reach.lib.dataset_specification import DatasetSpecification
 class AutoCodeSurveys(object):
     @staticmethod
     def auto_code_surveys(user, data, phone_uuid_table, coded_output_path, prev_coded_path):
-        cleaning_plan = DatasetSpecification.coding_plans
-
         # Mark missing entries in the raw data as true missing
         for td in data:
             missing = dict()
-            for plan in cleaning_plan:
+            for plan in DatasetSpecification.coding_plans:
                 if plan.source_field not in td:
                     missing[plan.source_field] = Codes.TRUE_MISSING
             td.append_data(missing, Metadata(user, Metadata.get_call_location(), time.time()))
@@ -27,7 +25,7 @@ class AutoCodeSurveys(object):
         # Clean all responses
         for td in data:
             cleaned = dict()
-            for plan in cleaning_plan:
+            for plan in DatasetSpecification.coding_plans:
                 if plan.cleaner is not None:
                     cleaned[plan.auto_coded_field] = plan.cleaner(td[plan.source_field])
             td.append_data(cleaned, Metadata(user, Metadata.get_call_location(), time.time()))
@@ -48,7 +46,7 @@ class AutoCodeSurveys(object):
 
         # Output for manual verification + coding
         IOUtils.ensure_dirs_exist(coded_output_path)
-        for plan in cleaning_plan:
+        for plan in DatasetSpecification.coding_plans:
             coded_output_file_path = path.join(coded_output_path, "{}.csv".format(plan.coda_name))
             prev_coded_output_file_path = path.join(prev_coded_path, "{}_coded.csv".format(plan.coda_name))
 
