@@ -47,7 +47,7 @@ class AnalysisFile(object):
         avf_consent_withdrawn_key = "withdrawn_consent"
 
         # Translate keys to final values for analysis
-        show_keys = set()  # of all matrix keys
+        show_keys = set()  # of all radio show matrix keys
         AnalysisKeys.set_analysis_keys(user, data, {
             "UID": "avf_phone_id",
             "operator": "operator",
