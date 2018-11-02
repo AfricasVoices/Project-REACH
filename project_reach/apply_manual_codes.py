@@ -1,9 +1,6 @@
 import time
 from os import path
 
-import time
-from os import path
-
 import pytz
 from core_data_modules.cleaners import CharacterCleaner, Codes
 from core_data_modules.cleaners.codes import SomaliaCodes
@@ -111,18 +108,18 @@ class ApplyManualCodes(object):
                 # This check is needed to in order to continue producing analysis datasets identical to those used
                 # in the report for REACH.
                 # This error impacts 1 line in the messages analysis dataset (of about 26,000).
-                td.append_data({key_of_coded_nr: "0"}, Metadata(user, Metadata.get_call_location(), time.time()))
+                td.append_data({key_of_coded_nr: Codes.MATRIX_0}, Metadata(user, Metadata.get_call_location(), time.time()))
 
         # Assume everything that wasn't reviewed should have been assigned NOT_CODED, to work around a Coda bug
         key_of_coded_nc = "{}{}".format(key_of_coded_prefix, Codes.NOT_CODED)
         for td in data:
-            if td.get(key_of_coded_nr) == "1":
-                td.append_data({key_of_coded_nc: "1"}, Metadata(user, Metadata.get_call_location(), time.time()))
+            if td.get(key_of_coded_nr) == Codes.MATRIX_1:
+                td.append_data({key_of_coded_nc: Codes.MATRIX_1}, Metadata(user, Metadata.get_call_location(), time.time()))
 
         # Set messages that weren't relevant as NOT_CODED
         for td in data:
             if td.get(key_of_coded_relevance) == Codes.NO or td.get("noise") is not None:
-                td.append_data({key_of_coded_nc: "1"}, Metadata(user, Metadata.get_call_location(), time.time()))
+                td.append_data({key_of_coded_nc: Codes.MATRIX_1}, Metadata(user, Metadata.get_call_location(), time.time()))
 
         # Output to The Interface
         utc_key = "{} (Time) - {}".format(variable_name, flow_name)
