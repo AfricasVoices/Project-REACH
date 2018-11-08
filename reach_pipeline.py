@@ -3,11 +3,11 @@ import argparse
 from core_data_modules.traced_data.io import TracedDataJsonIO
 from core_data_modules.util import IOUtils, PhoneNumberUuidTable
 
+from project_reach import AnalysisFile
+from project_reach import ApplyManualCodes
+from project_reach import AutoCodeShowMessages
+from project_reach import AutoCodeSurveys
 from project_reach import CombineRawDatasets
-from project_reach.analysis_file import AnalysisFile
-from project_reach.apply_manual_codes import ApplyManualCodes
-from project_reach.auto_code_show_messages import AutoCodeShowMessages
-from project_reach.auto_code_surveys import AutoCodeSurveys
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Runs the post-fetch phase of the REACH pipeline")

@@ -1,8 +1,4 @@
-import argparse
-
 from core_data_modules.traced_data import TracedData
-from core_data_modules.traced_data.io import TracedDataJsonIO
-from core_data_modules.util import IOUtils
 
 
 class CombineRawDatasets(object):
