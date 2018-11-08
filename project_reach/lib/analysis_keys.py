@@ -35,8 +35,8 @@ class AnalysisKeys(object):
                     code_no_key = key.replace(coded_shows_prefix, no_prefix)
                     show_keys.update({code_yes_key, code_no_key})
 
-                    matrix_d[code_yes_key] = td[key] if yes_no == Codes.YES else "0"
-                    matrix_d[code_no_key] = td[key] if yes_no == Codes.NO else "0"
+                    matrix_d[code_yes_key] = td[key] if yes_no == Codes.YES else Codes.MATRIX_0
+                    matrix_d[code_no_key] = td[key] if yes_no == Codes.NO else Codes.MATRIX_0
 
             td.append_data(matrix_d, Metadata(user, Metadata.get_call_location(), time.time()))
 
@@ -45,7 +45,7 @@ class AnalysisKeys(object):
         for td in data:
             matrix_d = dict()
 
-            stopped = td.get("{}_{}".format(coded_shows_prefix, Codes.STOP)) == "1"
+            stopped = td.get("{}_{}".format(coded_shows_prefix, Codes.STOP)) == Codes.MATRIX_1
 
             for output_key in td:
                 if output_key.startswith(coded_shows_prefix):
