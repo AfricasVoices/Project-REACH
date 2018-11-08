@@ -1,7 +1,7 @@
 from dateutil.parser import isoparse
 
 
-# TODO: Move to Core once adapted for and tested on a pipeline supports multiple radio shows
+# TODO: Move to Core once adapted for and tested on a pipeline that supports multiple radio shows
 class MessageFilters(object):
     # TODO: Log which data is being dropped?
     @staticmethod
