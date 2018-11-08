@@ -73,13 +73,45 @@ if __name__ == "__main__":
         data = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
 
     # Translate keys to final values for analysis
-    show_keys = set()
-    for td in data:
-        AnalysisKeys.set_analysis_keys(user, td)
-        AnalysisKeys.set_matrix_keys(
-            user, td, show_keys, "S07E01_Humanitarian_Priorities (Text) - esc4jmcna_activation_coded",
-            "humanitarian_priorities"
-        )
+    show_keys = set()  # of all radio show matrix keys
+    AnalysisKeys.set_analysis_keys(user, data, {
+        "UID": "avf_phone_id",
+        "operator": "operator",
+        "humanitarian_priorities_raw": "S07E01_Humanitarian_Priorities (Text) - esc4jmcna_activation",
+
+        "gender": "gender_coded",
+        "gender_raw": "gender_review",
+
+        "district": "district_coded",
+        "region": "region_coded",
+        "state": "state_coded",
+        "zone": "zone_coded",
+        "district_raw": "district_review",
+
+        "urban_rural": "urban_rural_coded",
+        "urban_rural_raw": "urban_rural_review",
+
+        "age": "age_coded",
+        "age_raw": "age_review",
+
+        "assessment": "assessment_coded",
+        "assessment_raw": "assessment_review",
+
+        "idp": "idp_coded",
+        "idp_raw": "idp_review",
+
+        "involved": "involved_esc4jmcna_coded",
+        "involved_raw": "involved_esc4jmcna",
+
+        "repeated": "repeated_esc4jmcna_coded",
+        "repeated_raw": "repeated_esc4jmcna"
+    })
+
+    AnalysisKeys.set_matrix_keys(
+        user, data, show_keys, "S07E01_Humanitarian_Priorities (Text) - esc4jmcna_activation_coded",
+        "humanitarian_priorities"
+    )
+
     show_keys = list(show_keys)
     show_keys.sort()
 
@@ -112,17 +144,20 @@ if __name__ == "__main__":
     # Set consent withdrawn based on stop codes from humanitarian priorities.
     # TODO: Update Core Data to set 'stop's instead of '1's?
     for td in data:
-        if td.get("humanitarian_priorities_stop") == "1":
-            td.append_data({avf_consent_withdrawn_key: Codes.TRUE}, Metadata(user, Metadata.get_call_location(), time.time()))
+        if td.get("humanitarian_priorities_stop") == Codes.MATRIX_1:
+            td.append_data({avf_consent_withdrawn_key: Codes.TRUE},
+                           Metadata(user, Metadata.get_call_location(), time.time()))
 
     # Set consent withdrawn based on auto-categorisation in Rapid Pro
     for td in data:
         if td.get(rapid_pro_consent_withdrawn_key) == "yes":  # Not using Codes.YES because this is from Rapid Pro
-            td.append_data({avf_consent_withdrawn_key: Codes.TRUE}, Metadata(user, Metadata.get_call_location(), time.time()))
+            td.append_data({avf_consent_withdrawn_key: Codes.TRUE},
+                           Metadata(user, Metadata.get_call_location(), time.time()))
 
     for td in data:
         if avf_consent_withdrawn_key not in td:
-            td.append_data({avf_consent_withdrawn_key: Codes.FALSE}, Metadata(user, Metadata.get_call_location(), time.time()))
+            td.append_data({avf_consent_withdrawn_key: Codes.FALSE},
+                           Metadata(user, Metadata.get_call_location(), time.time()))
 
     # Fold data to have one respondent per row
     to_be_folded = []
@@ -135,7 +170,6 @@ if __name__ == "__main__":
     )
 
     # Process consent
-    stop_keys = set(export_keys) - {avf_consent_withdrawn_key}
     ConsentUtils.set_stopped(user, data, avf_consent_withdrawn_key)
     ConsentUtils.set_stopped(user, folded_data, avf_consent_withdrawn_key)
 
@@ -148,4 +182,5 @@ if __name__ == "__main__":
 
     # Export JSON
     with open(json_output_path, "w") as f:
-        TracedDataJsonIO.export_traced_data_iterable_to_json(folded_data, f, pretty_print=True)
+        f.write("[]")
+        # TracedDataJsonIO.export_traced_data_iterable_to_json(folded_data, f, pretty_print=True)
