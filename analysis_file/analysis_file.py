@@ -182,5 +182,4 @@ if __name__ == "__main__":
 
     # Export JSON
     with open(json_output_path, "w") as f:
-        f.write("[]")
-        # TracedDataJsonIO.export_traced_data_iterable_to_json(folded_data, f, pretty_print=True)
+        TracedDataJsonIO.export_traced_data_iterable_to_json(folded_data, f, pretty_print=True)
