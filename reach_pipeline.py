@@ -1,6 +1,5 @@
 import argparse
 
-from core_data_modules.traced_data import TracedData
 from core_data_modules.traced_data.io import TracedDataJsonIO
 from core_data_modules.util import IOUtils, PhoneNumberUuidTable
 
@@ -57,12 +56,12 @@ if __name__ == "__main__":
     csv_by_individual_output_path = args.csv_by_individual_output_path
 
     # Load messages
-    print("Load Messages")
+    print("Loading Messages...")
     with open(raw_messages_input_path, "r") as f:
         messages = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
 
     # Load surveys
-    print("Load Surveys")
+    print("Loading Surveys...")
     with open(raw_surveys_input_path, "r") as f:
         surveys = TracedDataJsonIO.import_json_to_traced_data_iterable(f)
 
@@ -71,25 +70,25 @@ if __name__ == "__main__":
         phone_number_uuid_table = PhoneNumberUuidTable.load(f)
 
     # Add survey data to the messages
-    print("Combine Datasets")
+    print("Combining Datasets...")
     data = CombineRawDatasets.combine_raw_datasets(user, messages, surveys)
 
-    print("Auto Code Messages")
+    print("Auto Coding Messages...")
     prev_coda_path = "{}/esc4jmcna_activation.csv".format(prev_coded_dir_path)
     coda_output_path = "{}/esc4jmcna_activation.csv".format(coded_dir_path)
     data = AutoCodeShowMessages.auto_code_show_messages(user, data, icr_output_path, coda_output_path, prev_coda_path)
 
-    print("Auto Code Surveys")
+    print("Auto Coding Surveys...")
     data = AutoCodeSurveys.auto_code_surveys(user, data, phone_number_uuid_table, coded_dir_path, prev_coded_dir_path)
 
-    print("Apply Manual Codes")
+    print("Applying Manual Codes from Coda...")
     data = ApplyManualCodes.apply_manual_codes(user, data, prev_coded_dir_path, interface_output_dir)
 
-    print("Generating Analysis CSVs")
+    print("Generating Analysis CSVs...")
     data = AnalysisFile.generate(user, data, csv_by_message_output_path, csv_by_individual_output_path)
 
     # Write json output
-    print("Write Output")
+    print("Writing TracedData to file...")
     IOUtils.ensure_dirs_exist_for_file(json_output_path)
     with open(json_output_path, "w") as f:
         TracedDataJsonIO.export_traced_data_iterable_to_json(data, f, pretty_print=True)
