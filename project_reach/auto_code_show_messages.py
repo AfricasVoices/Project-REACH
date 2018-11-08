@@ -1,4 +1,5 @@
 import os
+import random
 import time
 
 from core_data_modules.cleaners import somali
@@ -56,7 +57,7 @@ class AutoCodeShowMessages(object):
                 TracedDataCodaIO.export_traced_data_iterable_to_coda(not_noise, show_message_key, f)
 
         # Randomly select some messages to export for ICR
-        icr_messages = ICRTools.generate_sample_for_icr(not_noise, icr_messages_count)
+        icr_messages = ICRTools.generate_sample_for_icr(not_noise, icr_messages_count, random.Random(0))
 
         # Output ICR data to a CSV file
         run_id_key = "{} (Run ID) - {}".format(variable_name, flow_name)
