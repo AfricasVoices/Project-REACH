@@ -12,11 +12,11 @@ from dateutil.parser import isoparse
 
 
 class ApplyManualCodes(object):
-    @staticmethod
-    def apply_manual_codes(user, data, coded_input_path, interface_output_dir):
-        variable_name = "S07E01_Humanitarian_Priorities"
-        flow_name = "esc4jmcna_activation"
+    VARIABLE_NAME = "S07E01_Humanitarian_Priorities"
+    FLOW_NAME = "esc4jmcna_activation"
 
+    @classmethod
+    def apply_manual_codes(cls, user, data, coded_input_path, interface_output_dir):
         class MergePlan:
             def __init__(self, raw_field, coded_field, coda_name):
                 self.raw_field = raw_field
@@ -122,8 +122,8 @@ class ApplyManualCodes(object):
                 td.append_data({key_of_coded_nc: Codes.MATRIX_1}, Metadata(user, Metadata.get_call_location(), time.time()))
 
         # Output to The Interface
-        utc_key = "{} (Time) - {}".format(variable_name, flow_name)
-        eat_key = "{} (Time EAT) - {}".format(variable_name, flow_name)
+        utc_key = "{} (Time) - {}".format(cls.VARIABLE_NAME, cls.FLOW_NAME)
+        eat_key = "{} (Time EAT) - {}".format(cls.VARIABLE_NAME, cls.FLOW_NAME)
         for td in data:
             # TODO: If we still need The Interface, update Core to do the timezone conversion in the exporter.
             utc_time = isoparse(td[utc_key])
