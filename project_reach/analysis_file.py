@@ -7,7 +7,7 @@ from core_data_modules.traced_data.io import TracedDataCSVIO
 from core_data_modules.traced_data.util import FoldTracedData
 from core_data_modules.util.consent_utils import ConsentUtils
 
-from project_reach.lib.analysis_keys import AnalysisKeys
+from project_reach.lib import AnalysisKeys
 
 
 class AnalysisFile(object):
