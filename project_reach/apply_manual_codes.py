@@ -43,7 +43,7 @@ class ApplyManualCodes(object):
                 print("Warning: No Coda file found for key '{}'".format(plan.coda_name))
                 for td in data:
                     td.append_data(
-                        {plan.coded_field: None},  # TODO: Set to NR not to None
+                        {plan.coded_field: Codes.NOT_REVIEWED},
                         Metadata(user, Metadata.get_call_location(), time.time())
                     )
                 continue
