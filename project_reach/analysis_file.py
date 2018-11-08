@@ -86,7 +86,7 @@ class AnalysisFile(object):
         # Set consent withdrawn based on stop codes from humanitarian priorities.
         # TODO: Update Core Data to set 'stop's instead of '1's?
         for td in data:
-            if td.get("humanitarian_priorities_stop") == "1":
+            if td.get("humanitarian_priorities_stop") == Codes.MATRIX_1:
                 td.append_data({avf_consent_withdrawn_key: Codes.TRUE},
                                Metadata(user, Metadata.get_call_location(), time.time()))
 
