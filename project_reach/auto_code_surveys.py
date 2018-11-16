@@ -1,14 +1,13 @@
-import argparse
 import os
 import time
 from os import path
 
 from core_data_modules.cleaners import somali, Codes, PhoneCleaner
-from core_data_modules.traced_data import Metadata, TracedData
-from core_data_modules.traced_data.io import TracedDataJsonIO, TracedDataCodaIO
-from core_data_modules.util import IOUtils, PhoneNumberUuidTable
+from core_data_modules.traced_data import Metadata
+from core_data_modules.traced_data.io import TracedDataCodaIO
+from core_data_modules.util import IOUtils
 
-from project_reach.lib.channel import Channels
+from project_reach.lib import Channels
 
 
 class AutoCodeSurveys(object):
