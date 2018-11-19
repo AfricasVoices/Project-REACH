@@ -1,7 +1,7 @@
 from dateutil.parser import isoparse
 
 
-# TODO: Move to Core
+# TODO: Move to Core once adapted for and tested on a pipeline that supports multiple radio shows
 class MessageFilters(object):
     # TODO: Log which data is being dropped?
     @staticmethod
@@ -9,9 +9,18 @@ class MessageFilters(object):
         return [td for td in messages if not td.get(test_run_key, False)]
 
     @staticmethod
+    def filter_empty_messages(messages, message_key):
+        # TODO: Before using on future projects, consider whether messages which are "" should be considered as empty
+        non_empty = []
+        for td in messages:
+            if message_key in td:
+                non_empty.append(td)
+        return non_empty
+
+    @staticmethod
     def filter_time_range(messages, time_key, start_time, end_time):
-        return [td for td in messages if start_time <= isoparse(td[time_key]) <= end_time]
+        return [td for td in messages if start_time <= isoparse(td.get(time_key)) <= end_time]
 
     @staticmethod
     def filter_noise(messages, message_key, noise_fn):
-        return [td for td in messages if not noise_fn(td[message_key])]
+        return [td for td in messages if not noise_fn(td.get(message_key))]

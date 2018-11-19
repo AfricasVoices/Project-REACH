@@ -26,22 +26,18 @@ class AutoCodeShowMessages(object):
         data = MessageFilters.filter_test_messages(data)
 
         # Filter for runs which contain a response to this week's question.
-        data = [td for td in data if cls.SHOW_MESSAGE_KEY in td]
+        data = MessageFilters.filter_empty_messages(data, cls.SHOW_MESSAGE_KEY)
 
         time_key = "{} (Time) - {}".format(cls.VARIABLE_NAME, cls.FLOW_NAME)
         data = MessageFilters.filter_time_range(data, time_key, cls.PROJECT_START_DATE, cls.PROJECT_END_DATE)
 
-        # Identify messages which aren't noise, for export to Coda
-        print("Messages classified as noise:")
-        not_noise = []
+        # Tag messages which are noise as being noise
         for td in data:
             if somali.DemographicCleaner.is_noise(td[cls.SHOW_MESSAGE_KEY], min_length=20):
-                print("Dropping: {}".format(td[cls.SHOW_MESSAGE_KEY]))
                 td.append_data({"noise": "true"}, Metadata(user, Metadata.get_call_location(), time.time()))
-            else:
-                not_noise.append(td)
 
-        print("{}:{} Dropped as noise/Total".format(len(data) - len(not_noise), len(data)))
+        # Filter for messages which aren't noise (in order to export to Coda and export for ICR)
+        not_noise = MessageFilters.filter_noise(data, "noise", lambda x: x)
 
         # Output messages which aren't noise to Coda
         IOUtils.ensure_dirs_exist_for_file(coda_output_path)
