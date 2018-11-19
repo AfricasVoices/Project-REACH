@@ -6,7 +6,7 @@ IMAGE_NAME=reach-daap
 
 # Check that the correct number of arguments were provided.
 if [ $# -ne 11 ]; then
-    echo "Usage: sh docker-run.sh <user> <phone-number-uuid-table-path> <messages-input-path> <survey-input-path> <prev-coded-dir> <json-output-path> <interface-output-dir> <icr-output-path> <coded-output-dir> <messages-output-csv> <individuals-output-csv>"
+    echo "Usage: ./docker-run.sh <user> <phone-number-uuid-table-path> <messages-input-path> <survey-input-path> <prev-coded-dir> <json-output-path> <interface-output-dir> <icr-output-path> <coded-output-dir> <messages-output-csv> <individuals-output-csv>"
     exit
 fi
 

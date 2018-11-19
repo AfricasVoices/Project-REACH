@@ -7,7 +7,7 @@ from core_data_modules.traced_data import Metadata
 from core_data_modules.traced_data.io import TracedDataCodaIO
 from core_data_modules.util import IOUtils
 
-from project_reach.lib.channel import Channels
+from project_reach.lib import Channels
 from project_reach.lib.dataset_specification import DatasetSpecification
 
 

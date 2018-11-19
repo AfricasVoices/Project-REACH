@@ -3,7 +3,7 @@
 set -e
 
 if [ $# -ne 1 ]; then
-    echo "Usage: sh checkout_rapid_pro_tools.sh <rapid-pro-tools-dir>"
+    echo "Usage: ./checkout_rapid_pro_tools.sh <rapid-pro-tools-dir>"
     echo "Ensures that a copy of the RapidProTools project exists in  'rapid-pro-tools-dir' by cloning/fetching as "
     echo "necessary, and checking-out the version needed by this project"
     exit
@@ -12,7 +12,7 @@ fi
 RAPID_PRO_TOOLS_DIR="$1"
 
 RAPID_PRO_TOOLS_REPO="https://github.com/AfricasVoices/RapidProTools.git"
-TAG="v0.2.3"
+TAG="v0.2.4"
 
 mkdir -p "$RAPID_PRO_TOOLS_DIR"
 cd "$RAPID_PRO_TOOLS_DIR"
