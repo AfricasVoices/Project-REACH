@@ -11,7 +11,11 @@ class MessageFilters(object):
     @staticmethod
     def filter_empty_messages(messages, message_key):
         # TODO: Before using on future projects, consider whether messages which are "" should be considered as empty
-        return [td for td in messages if message_key in td]
+        non_empty = []
+        for td in messages:
+            if message_key in td:
+                non_empty.append(td)
+        return non_empty
 
     @staticmethod
     def filter_time_range(messages, time_key, start_time, end_time):
