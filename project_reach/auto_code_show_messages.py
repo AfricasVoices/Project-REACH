@@ -33,7 +33,7 @@ class AutoCodeShowMessages(object):
 
         # Tag messages which are noise as being noise
         for td in data:
-            if somali.DemographicCleaner.is_noise(td[SHOW_MESSAGE_KEY], min_length=20):
+            if somali.DemographicCleaner.is_noise(td[cls.SHOW_MESSAGE_KEY], min_length=20):
                 td.append_data({"noise": "true"}, Metadata(user, Metadata.get_call_location(), time.time()))
 
         # Filter for messages which aren't noise (in order to export to Coda and export for ICR)
