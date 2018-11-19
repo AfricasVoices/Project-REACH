@@ -1,5 +1,7 @@
 from core_data_modules.cleaners import somali
 
+# Note: This module project-specific and not yet suitable for migration to Core
+
 
 class CodingPlan(object):
     def __init__(self, source_field, auto_coded_field, manually_coded_field, coda_name, cleaner=None):
