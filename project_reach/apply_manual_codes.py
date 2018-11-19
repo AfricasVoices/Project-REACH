@@ -10,6 +10,8 @@ from core_data_modules.traced_data.io import TracedDataCodaIO, TracedDataTheInte
 from core_data_modules.util import IOUtils
 from dateutil.parser import isoparse
 
+from project_reach.lib.dataset_specification import DatasetSpecification
+
 
 class ApplyManualCodes(object):
     VARIABLE_NAME = "S07E01_Humanitarian_Priorities"
@@ -17,40 +19,22 @@ class ApplyManualCodes(object):
 
     @classmethod
     def apply_manual_codes(cls, user, data, coded_input_path, interface_output_dir):
-        class MergePlan:
-            def __init__(self, raw_field, coded_field, coda_name):
-                self.raw_field = raw_field
-                self.coded_field = coded_field
-                self.coda_name = coda_name
-
-        merge_plan = [
-            MergePlan("gender_review", "gender_coded", "Gender"),
-            MergePlan("district_review", "district_coded", "District"),
-            MergePlan("urban_rural_review", "urban_rural_coded", "Urban_Rural"),
-            MergePlan("age_review", "age_coded", "Age"),
-            MergePlan("assessment_review", "assessment_coded", "Assessment"),
-            MergePlan("idp_review", "idp_coded", "IDP"),
-
-            MergePlan("involved_esc4jmcna", "involved_esc4jmcna_coded", "Involved"),
-            MergePlan("repeated_esc4jmcna", "repeated_esc4jmcna_coded", "Repeated")
-        ]
-
         # Merge manually coded survey/evaluation Coda files into the cleaned dataset
-        for plan in merge_plan:
+        for plan in DatasetSpecification.coding_plans:
             coda_file_path = path.join(coded_input_path, "{}_coded.csv".format(plan.coda_name))
 
             if not path.exists(coda_file_path):
                 print("Warning: No Coda file found for key '{}'".format(plan.coda_name))
                 for td in data:
                     td.append_data(
-                        {plan.coded_field: Codes.NOT_REVIEWED},
+                        {plan.manually_coded_field: Codes.NOT_REVIEWED},
                         Metadata(user, Metadata.get_call_location(), time.time())
                     )
                 continue
 
             with open(coda_file_path, "r") as f:
                 TracedDataCodaIO.import_coda_to_traced_data_iterable(
-                    user, data, plan.raw_field, {plan.coda_name: plan.coded_field}, f, True)
+                    user, data, plan.source_field, {plan.coda_name: plan.manually_coded_field}, f, True)
 
         # Set districts coded as 'other' to 'NOT_CODED'
         for td in data:
